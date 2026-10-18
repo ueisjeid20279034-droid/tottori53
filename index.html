@@ -1,0 +1,2207 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="鳥取県の統計をもとに、鳥取に生まれたひとりの一生を見届ける人生シミュレーション。">
+<meta property="og:title" content="53万分の1">
+<meta property="og:description" content="鳥取に生まれ、出るのか、残るのか、また戻るのか。一度きりの人生を最後まで見届けます。">
+<style>*,*::before,*::after{box-sizing:border-box}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>53万分の1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* 冬の日本海の空を地にして、「鳥取にいた年」を梨の黄緑、「県外にいた年」を海の青で塗り分ける。1マス＝1年の人生地図が主役。 */
+:root{
+  --bg:#eaeef1; --surface:#f8fafb; --ink:#1b2833; --muted:#5a6873; --line:#cfd8df;
+  --tottori:#86a62a; --tottori-ink:#4f6612; --out:#4f7395; --out-ink:#2f5170;
+  --empty:#dde4e9; --loss:#8a5a63;
+  --c-cash:#6f9a1f; --c-inv:#2f6fb3; --c-debt:#d9772b; --c-inc:#6d7a85;
+  --f-display:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif;
+  --f-body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",sans-serif;
+  --f-num:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11181e; --surface:#18222a; --ink:#e4eaee; --muted:#93a2ad; --line:#2a3741;
+  --tottori:#a3c247; --tottori-ink:#bcd667; --out:#6e93b6; --out-ink:#9dbbd8;
+  --empty:#22303a; --loss:#c99aa3; --c-cash:#73992a; --c-inv:#4a88cc; --c-debt:#d27a3c; --c-inc:#8696a2; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11181e; --surface:#18222a; --ink:#e4eaee; --muted:#93a2ad; --line:#2a3741;
+  --tottori:#a3c247; --tottori-ink:#bcd667; --out:#6e93b6; --out-ink:#9dbbd8;
+  --empty:#22303a; --loss:#c99aa3; --c-cash:#73992a; --c-inv:#4a88cc; --c-debt:#d27a3c; --c-inc:#8696a2; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.7;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:980px;margin:0 auto}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,summary:focus-visible{outline:2px solid var(--out);outline-offset:2px}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+
+/* start */
+#start{display:grid;gap:28px;padding-block:24px}
+.mast h1{font-family:var(--f-display);font-weight:800;font-size:clamp(52px,12vw,104px);line-height:1;margin:0;letter-spacing:.01em;text-wrap:balance}
+.mast h1 small{display:block;font-size:.26em;font-weight:600;color:var(--muted);letter-spacing:.2em;margin-top:14px}
+.lead{max-width:34em;font-size:16px;margin:0}
+.facts{display:flex;flex-wrap:wrap;gap:10px 28px;margin:0;padding:0;list-style:none;color:var(--muted);font-size:13px}
+.facts b{display:block;font-family:var(--f-num);font-weight:500;color:var(--ink);font-size:20px}
+.crowd{display:grid;gap:14px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding-block:16px}
+.cstats{display:flex;flex-wrap:wrap;gap:10px 28px}
+.cstats div{display:grid;font-size:12px;color:var(--muted)}
+.cstats b{font-family:var(--f-num);font-weight:500;font-size:22px;color:var(--ink);font-variant-numeric:tabular-nums}
+.crecent h2{font-family:var(--f-display);font-size:18px;margin:0 0 6px}
+.crecent ol{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.crecent li{font-size:13px;line-height:1.6;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.crecent li .cm{display:block;color:var(--muted);font-size:12.5px}
+.crecent li .cq{display:block;margin-top:2px}
+.crecent li .cq::before{content:"ひとこと ";font-size:11px;font-weight:700;color:var(--tottori-ink);letter-spacing:.06em}
+.cnote{font-size:12px;color:var(--muted);margin:0}
+.leave{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.leave input{flex:1 1 220px;min-width:0;font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+.gens{display:grid;gap:6px}
+.money{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;margin-top:10px;font-size:12px;color:var(--muted)}
+.money div{display:flex;align-items:center;gap:6px;justify-content:space-between}
+.money .lb{display:flex;align-items:center;gap:6px}
+.money i{display:inline-block;width:9px;height:9px;border-radius:2px}
+.money b{font-family:var(--f-num);font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.money .net{grid-column:1/-1;border-top:1px solid var(--line);padding-top:4px;font-size:13px;color:var(--ink)}
+.money .net b{font-size:15px}
+.charts{position:relative;margin-top:12px;display:grid;gap:6px}
+.charts .cht{font-size:11px;color:var(--muted);letter-spacing:.04em;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.charts .lg{display:flex;gap:10px}
+.charts .lg span{display:inline-flex;align-items:center;gap:4px}
+.charts .lg i{display:inline-block;width:8px;height:8px;border-radius:2px}
+.charts svg{width:100%;height:auto;display:block;overflow:visible;touch-action:none}
+.charts svg text{font-family:var(--f-num);font-size:9px;fill:var(--muted)}
+.charts .ax{stroke:var(--line);stroke-width:1}
+.charts .zero{stroke:var(--muted);stroke-width:1}
+.charts .xh{stroke:var(--ink);stroke-width:1;opacity:.5}
+.tip{position:absolute;z-index:3;pointer-events:none;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-size:11.5px;line-height:1.55;box-shadow:0 4px 14px rgba(0,0,0,.12);min-width:150px}
+.tip b{font-family:var(--f-num);font-weight:500}
+.tip .tr{display:flex;justify-content:space-between;gap:10px}
+.tip i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px}
+.endcharts .charts{margin-top:0}
+ol.log li.money .t::before{content:"お金 ";font-size:11px;font-weight:700;color:var(--c-inv);letter-spacing:.06em}
+ol.log li.joy .t{color:var(--tottori-ink)}
+.genGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.genGrid button{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:10px 12px;display:grid;gap:2px}
+.genGrid button:hover{border-color:var(--ink)}
+.genGrid button[aria-pressed="true"]{border-color:var(--tottori);box-shadow:inset 0 0 0 1px var(--tottori)}
+.genGrid .gn{font-weight:700;font-size:14px}
+.genGrid .gy{font-family:var(--f-num);font-size:11px;color:var(--muted)}
+.genGrid .gd{font-size:12px;color:var(--muted);line-height:1.5}
+ol.log li.trend .t::before{content:"はやり ";font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em}
+ol.log li.future .t{color:var(--out-ink)}
+ol.log li.future .t::before{content:"未来 ";font-size:11px;font-weight:700;letter-spacing:.06em}
+.gtag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;border:1px solid var(--line);border-radius:4px;padding:0 6px;margin-left:6px;color:var(--ink)}
+.setup{display:flex;flex-wrap:wrap;gap:16px;align-items:end}
+.seg{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.seg button{border:0;background:transparent;padding:7px 14px;font-size:13px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.lbl{font-size:12px;color:var(--muted);letter-spacing:.08em;display:block;margin-bottom:6px}
+.primary{border:0;border-radius:999px;background:var(--tottori);color:#17210a;font-weight:700;padding:12px 28px;font-size:16px}
+.primary:hover{filter:brightness(1.05)}
+.ghost{border:1px solid var(--line);background:transparent;border-radius:999px;padding:7px 14px;font-size:13px}
+.ghost[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--bg)}
+details{color:var(--muted);font-size:13px;max-width:46em}
+details summary{cursor:pointer;color:var(--ink)}
+details ul{padding-left:1.2em;margin:8px 0}
+
+/* play */
+#play{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:760px){#play{grid-template-columns:minmax(0,1fr)}}
+.who{display:grid;gap:4px}
+.who .name{font-size:13px;color:var(--muted)}
+.age{font-family:var(--f-display);font-weight:800;font-size:72px;line-height:1}
+.age span{font-size:22px;margin-left:4px}
+.where{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:500}
+.job{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13px;color:var(--muted);min-height:1.7em}
+.job .inc{color:var(--ink);font-weight:700}
+.chip{font-size:12px;font-weight:700;border-radius:4px;padding:1px 8px;letter-spacing:.06em}
+.chip.tottori{background:var(--tottori);color:#17210a}
+.chip.out{background:var(--out);color:#fff}
+.map{margin-top:18px}
+.grid{display:grid;grid-template-columns:28px repeat(10,1fr);gap:3px;align-items:center}
+.grid .rl{font-family:var(--f-num);font-size:10px;color:var(--muted);text-align:right;padding-right:4px}
+.cell{aspect-ratio:1;border-radius:2px;background:var(--empty);max-width:100%;position:relative}
+.cell.tottori{background:var(--tottori)}
+.cell.out{background:var(--out)}
+.cell.now{outline:2px solid var(--ink);outline-offset:1px}
+.cell.dead{background:var(--ink)}
+.cell.mk::after{content:"";position:absolute;inset:35%;border-radius:50%;background:var(--surface)}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:10px;flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.tally{display:flex;gap:18px;margin-top:10px;font-size:13px}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+
+.main{display:grid;gap:16px;min-width:0}
+.decide{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--tottori);border-radius:6px;padding:18px 20px;display:grid;gap:12px}
+.decide h2{font-family:var(--f-display);font-size:22px;margin:0;line-height:1.4;text-wrap:balance}
+.decide .stat{font-size:13px;color:var(--muted);margin:0}
+.decide .stat::before{content:"実際の数字 ";font-weight:700;color:var(--tottori-ink);letter-spacing:.06em}
+.opts{display:grid;gap:8px}
+.opts button{text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:6px;padding:10px 14px;font-weight:500}
+.opts button:hover{border-color:var(--ink)}
+.opts button{display:grid;gap:3px}
+.opts .ol{font-weight:700}
+.opts .pro,.opts .con{font-size:12.5px;font-weight:400;line-height:1.55;padding-left:1.4em;text-indent:-1.4em}
+.opts .pro{color:var(--tottori-ink)}
+.opts .con{color:var(--muted)}
+.opts .pro::before{content:"＋ ";font-weight:700}
+.opts .con::before{content:"－ ";font-weight:700}
+.tie{margin-top:12px;display:grid;gap:4px;font-size:12px;color:var(--muted)}
+.tie .tt{height:6px;background:var(--empty);border-radius:3px;overflow:hidden}
+.tie .tf{height:100%;background:var(--tottori);transition:width .4s}
+.logh{font-size:12px;color:var(--muted);letter-spacing:.1em;margin:0}
+ol.log{list-style:none;margin:0;padding:0;display:grid;gap:0;max-height:62vh;overflow:auto;border-top:1px solid var(--line)}
+ol.log li{display:grid;grid-template-columns:52px minmax(0,1fr);gap:10px;padding:8px 2px;border-bottom:1px solid var(--line);font-size:14px}
+ol.log li .a{font-family:var(--f-num);color:var(--muted);font-size:12px;padding-top:2px}
+ol.log li.flavor{color:var(--muted)}
+ol.log li.local .t{color:var(--ink)}
+ol.log li.era .t{color:var(--out-ink)}
+ol.log li.era .t::before{content:"時代 ";font-size:11px;font-weight:700;letter-spacing:.06em}
+ol.log li.dream .t{font-weight:700;color:var(--tottori-ink)}
+ol.log li .a small{display:block;font-size:10px;opacity:.8}
+.age .yr{font-family:var(--f-body);font-size:14px;font-weight:500;color:var(--muted);margin-left:12px;letter-spacing:.02em}
+.dreamc{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:8px;padding:8px 10px;border:1px dashed var(--line);border-radius:6px;font-size:13px}
+.dreamc .dl{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--tottori-ink)}
+.dreamc .ds{font-size:11px;color:var(--muted);margin-left:auto}
+.dreamc.done{border-style:solid;border-color:var(--tottori)}
+.dreamc.done .ds{color:var(--tottori-ink);font-weight:700}
+ol.log li.local .t::before{content:"地元 ";font-size:11px;font-weight:700;color:var(--tottori-ink);letter-spacing:.06em}
+ol.log li.move .t{font-weight:700}
+ol.log li.move.toout .t{color:var(--out-ink)}
+ol.log li.move.tohome .t{color:var(--tottori-ink)}
+ol.log li.fate .t{font-style:normal;color:var(--loss)}
+ol.log li.loss .t{color:var(--loss)}
+ol.log li.death .t{font-weight:700}
+@keyframes rise{from{background:color-mix(in srgb,var(--tottori) 18%,transparent)}to{background:transparent}}
+ol.log li.new{animation:rise 1.2s ease-out}
+@media (prefers-reduced-motion:reduce){ol.log li.new{animation:none}}
+
+/* end */
+.end{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:22px;display:grid;gap:18px}
+.end h2{font-family:var(--f-display);font-size:26px;margin:0;line-height:1.35;text-wrap:balance}
+.facts2{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px 18px;margin:0}
+.facts2 div{display:grid}
+.facts2 dt{font-size:12px;color:var(--muted)}
+.facts2 dd{margin:0;font-weight:700}
+.cohort h3,.forks h3{font-size:14px;margin:0 0 4px}
+.forks ol{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.forks li{display:grid;grid-template-columns:44px minmax(0,1fr);gap:8px;font-size:13px}
+.forks li .fa{font-family:var(--f-num);color:var(--muted);font-size:12px;padding-top:1px}
+.forks li .fq{color:var(--muted);font-size:12px;display:block}
+.forks p{font-size:13px;margin:8px 0 0}
+.cohort p{font-size:12px;color:var(--muted);margin:0 0 10px}
+.bar{display:grid;grid-template-columns:minmax(0,9.5em) minmax(0,1fr) 3.4em;gap:10px;align-items:center;font-size:13px;margin-bottom:8px}
+.track{height:12px;background:var(--empty);border-radius:2px;position:relative}
+.track .fill{position:absolute;inset:0 auto 0 0;background:var(--tottori);border-radius:2px}
+.bar .v{font-family:var(--f-num);text-align:right}
+.you{font-size:11px;color:var(--muted)}
+.actions{display:flex;flex-wrap:wrap;gap:10px}
+.toast{font-size:12px;color:var(--muted)}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <section id="start">
+    <div class="mast">
+      <h1>53万分の1<small>鳥取に生まれる</small></h1>
+    </div>
+    <p class="lead">鳥取県には約53万人が暮らしています。1年間にここで生まれる赤ちゃんは3,300人ほど。そのひとりとして生まれ、鳥取を出るのか、残るのか、また戻るのか。一度きりの人生を最後まで見届けます。生まれる町も家も、生まれる年も選べません。戦争や鳥取地震の時代に生まれることもあれば、まだ来ていない未来に生まれることもあります。10歳で選んだ夢が叶うかどうかは、人生の最後にわかります。</p>
+    <ul class="facts">
+      <li><b>9つの世代</b>戦中からこれからの世代まで</li>
+      <li><b>約53万人</b>県の推計人口</li>
+      <li><b>約5割</b>高校卒業後に県外へ進学</li>
+      <li><b>約35%</b>県外の学校から戻って就職</li>
+      <li><b>81.3 / 87.9歳</b>平均寿命（男 / 女）</li>
+      <li><b>約452万円</b>平均年収（正社員など）</li>
+    </ul>
+    <section class="crowd" id="crowd" hidden aria-label="みんなの人生">
+      <div class="cstats" id="cstats"></div>
+      <div class="crecent"><h2>みんなの人生</h2><ol id="crecent"></ol><p class="cnote" id="cempty">まだ誰も人生を終えていません。最初のひとりになってみてください。</p></div>
+    </section>
+    <div class="gens">
+      <span class="lbl" id="genl">どの世代に生まれる？（世代の呼び方や区切りには諸説あります）</span>
+      <div class="genGrid" role="group" aria-labelledby="genl" id="genGrid"></div>
+    </div>
+    <div class="setup">
+      <div>
+        <span class="lbl" id="spdl">1年の速さ</span>
+        <div class="seg" role="group" aria-labelledby="spdl" id="speedStart">
+          <button type="button" data-ms="1500" aria-pressed="false">ゆっくり</button>
+          <button type="button" data-ms="750" aria-pressed="true">ふつう</button>
+          <button type="button" data-ms="250" aria-pressed="false">はやい</button>
+        </div>
+      </div>
+      <button type="button" class="primary" id="born">鳥取に生まれる</button>
+    </div>
+    <details>
+      <summary>どこまでが実際のデータ？</summary>
+      <ul>
+        <li>生まれる市町村：各市町村の推計人口と出生の傾向から概算した重み</li>
+        <li>生まれる年：1925〜2045年。年ごとの鳥取県の出生数（県人口と全国の出生率からの概算）に応じて選ばれます</li>
+        <li>寿命：その年ごとの平均寿命（全国の完全生命表。2020年は鳥取県 男81.34歳・女87.91歳、2045年以降は将来推計の概算）と乳児死亡率に合うよう調整した死亡率。年をとるほど医療が進んだ時代を生きるので、人生ごとの寿命は平均寿命より長めになります</li>
+        <li>時代の出来事：鳥取地震（1943年、死者1,210人）、鳥取大火（1952年）、台風19号豪雨（1987年）、鳥取県西部地震（2000年）、鳥取県中部地震（2016年）、2017年の豪雪は県の災害記録から。戦争中の戦死の起こりやすさは概算です</li>
+        <li>時代による違い：高校進学率は全国の推移（1950年42.5%〜2024年98.6%）、18歳の進路、農業で働く人の割合、自宅出産の割合、結婚する人の割合、子どもの数、収入の水準は全国の推移などをもとにした概算です。収入は現在の価値に換算しています。古い時代の学校名は、統合や改名が多いため一般的な名前で表示します</li>
+        <li>夢：10歳で3枚のうち1枚を選びます。叶いやすさは夢によって違います</li>
+        <li>世代：呼び方や区切りには諸説あり、ここではゲーム用に区切っています。年ごとのはやりや暮らしの変化は、その年に該当する年齢のときに出てきます。2027年以降の出来事は「未来の想像」です</li>
+        <li>就職市場：大卒で就職する年の求人倍率（リクルートワークス研究所の大卒求人倍率、1987〜2012年3月卒）に応じて、正社員になれる確率が変わります。バブル期は2.86倍、就職氷河期の2000年は0.99倍でした</li>
+        <li>お金：手取りは年収の約8割、生活費は鳥取市の家計調査（二人以上の世帯の消費支出 月約31万円、2025年）の水準に近づけた概算です。家賃・住宅ローン（鳥取で2,500万円、県外で4,000万円の家を35年ローン）、子どもの養育費・学費、車、医療費を見込んでいます。結婚相手の収入も家計に入ります</li>
+        <li>投資：株式の値動きは日経平均の年ごとの騰落率（1986〜2025年）をもとにした概算で、バブル崩壊やリーマン・ショックの年には実際に大きく下がります。2026年以降はランダムです</li>
+        <li>年金と退職金：年金は厚生年金の平均月額（約14.9万円）と国民年金の平均月額（約5.4万円）をもとに、正社員として働いた年数で決まります。退職金は概算です。奨学金は、大学生の約半数（49.6%、2020年度）が利用している割合で借ります</li>
+        <li>失敗や挫折：失恋、仕事のミス、昇進の見送り、リストラや倒産（1998〜2003年と2008〜2010年は起こりやすい）、病気、事故などは、ゲーム用の頻度で起こります</li>
+        <li>みんなの記録：遊んだ人の人生は、遊んだ人の名前や連絡先を含まない形で、運営者のGoogleスプレッドシートに記録されます。ひとことは任意で、みんなの人生に名前なしで表示されます</li>
+        <li>リモート勤務：2020年以降の選択肢として登場します。決まる確率は、現在のゲーム用の見積もりと未来の想像です</li>
+        <li>18歳の進路：鳥取県の高校卒業者の進路状況（県外進学 約5割、県内進学・県内就職 各約2割）</li>
+        <li>Uターン：本県出身の県外大学等卒業生の県内就職率 35.1%（男29.6%・女39.9%、令和6年3月卒）と、戻りたいと考える学生 約7割（県の意識調査）</li>
+        <li>県外への転出先：鳥取県人口移動調査の転出先の割合</li>
+        <li>家の暮らし向き：国民生活基礎調査の生活意識（全国）</li>
+        <li>生まれる病院：厚生労働省「出産なび」の2024年の分娩件数（件数帯の中央値）を重みにした、県内でお産ができる病院・診療所13か所。住んでいる地域の施設から選ばれます。赤ちゃんに治療が必要なお産は、各地域の周産期医療を担う病院（県立中央病院・県立厚生病院・鳥取大学医学部附属病院）になります。県立中央病院・鳥取大学医学部附属病院・鎌沢マタニティークリニック・彦名レディスライフクリニックは件数の公表が見つからず、重みは概算です</li>
+        <li>祭り・観光名所：19市町村ごとの主な祭りと観光名所。住んでいる市町村のものを中心に出てきます</li>
+        <li>中学校：令和7年度の学級編制資料にある県内の公立中学校・義務教育学校と、国立・私立中学校の実名。住んでいる市町村の学校から、生徒数に応じた重みで決まります</li>
+        <li>高校・大学・専門学校：県内の全日制高校30校と米子高専、定時制・通信制、県内の大学・短大・専門学校の実名。どこに進むかは住んでいる地域と学校の規模による概算の重みで決まり、学力による振り分けはしていません</li>
+        <li>仕事の業種：令和2年国勢調査の鳥取県の産業別就業者の割合（正社員の割合も同調査の約68%に近づけています）</li>
+        <li>年収：令和5年賃金構造基本統計調査の鳥取県の平均（約452万円）を基準に、全国の年齢別の賃金カーブ、学歴・業種・都道府県の差を概算でかけ合わせています。業種や都道府県の係数はゲーム用の見積もりです</li>
+        <li>結婚・子ども：全国の50歳時の結婚経験率と、鳥取県の合計特殊出生率（1.44）に近づけた概算</li>
+        <li>人生の選択：選択肢の「＋」「－」にある年収の目安は、このゲームの年収の計算で出した30代前半・正社員の値です。持ち家率（69.6%、2023年住宅・土地統計調査）、空き家率（15.75%）、婚姻率（3.7、2022年）、3年以内の離職率（大卒33.8%・高卒37.9%）、65〜69歳の就業率（54.5%、2025年）は実際の数字です</li>
+        <li>地元とのつながり：成人式や祭り、地区の役、実家などの選択で上下し、Uターンや県外転出の起こりやすさを変えるゲーム上の値です</li>
+        <li>30代以降の転勤・Uターン、県内大学卒業後の県内就職（約6割）などは、統計がそろわないためゲーム用の見積もりです</li>
+        <li>死因は人口動態統計の年代別の構成をもとにした概算です。自殺など一部の死因は具体的に描かず、「その他」に含めています</li>
+      </ul>
+    </details>
+  </section>
+
+  <section id="play" hidden>
+    <aside>
+      <div class="who">
+        <div class="name" id="name"></div>
+        <div class="age"><span id="ageN" class="num">0</span><span>歳</span><span class="yr"><span id="yearN" class="num"></span>年</span></div>
+        <div class="where"><span class="chip" id="chip"></span><span id="place"></span></div>
+        <div class="job"><span id="job"></span><span class="inc" id="inc"></span></div>
+        <div class="dreamc" id="dreamC" hidden><span class="dl">夢</span><span id="dreamN"></span><span class="ds" id="dreamS"></span></div>
+      </div>
+      <div class="map">
+        <div class="grid" id="grid" aria-label="人生地図 1マス＝1年"></div>
+        <div class="legend">
+          <span><i style="background:var(--tottori)"></i>鳥取で過ごした年</span>
+          <span><i style="background:var(--out)"></i>県外で過ごした年</span>
+          <span>● 出た・戻った年</span>
+        </div>
+        <div class="tally"><span>鳥取 <b class="num" id="tIn">0</b>年</span><span>県外 <b class="num" id="tOut">0</b>年</span></div>
+        <div class="tie"><span>地元とのつながり（戻りやすさ・残りやすさに影響）</span><div class="tt"><div class="tf" id="tieF"></div></div></div>
+        <div class="tie"><span>しあわせ度（できごとや暮らし向きで上下）</span><div class="tt"><div class="tf" id="hapF" style="background:var(--c-inv)"></div></div></div>
+        <div class="money" id="money">
+          <div><span class="lb"><i style="background:var(--c-cash)"></i>貯金</span><b id="mCash">0</b></div>
+          <div><span class="lb"><i style="background:var(--c-inv)"></i>投資</span><b id="mInv">0</b></div>
+          <div><span class="lb"><i style="background:var(--c-debt)"></i>ローン・借金</span><b id="mDebt">0</b></div>
+          <div><span class="lb">年金</span><b id="mPen">—</b></div>
+          <div class="net"><span>純資産（貯金＋投資−借金）</span><b id="mNet">0</b></div>
+        </div>
+        <div class="charts" id="chartA"></div>
+      </div>
+      <div class="controls">
+        <button type="button" class="ghost" id="pause">一時停止</button>
+        <div class="seg" role="group" aria-label="速さ" id="speedPlay">
+          <button type="button" data-ms="1500" aria-pressed="false">ゆっくり</button>
+          <button type="button" data-ms="750" aria-pressed="true">ふつう</button>
+          <button type="button" data-ms="250" aria-pressed="false">はやい</button>
+        </div>
+        <button type="button" class="ghost" id="auto" aria-pressed="false">おまかせ</button>
+      </div>
+    </aside>
+    <div class="main">
+      <div class="decide" id="decide" hidden>
+        <h2 id="dTitle"></h2>
+        <p class="stat" id="dStat"></p>
+        <div class="opts" id="dOpts"></div>
+      </div>
+      <div class="end" id="end" hidden></div>
+      <p class="logh">人生の記録　新しい順</p>
+      <ol class="log" id="log"></ol>
+    </div>
+  </section>
+</div>
+
+<script>
+/* 53万分の1 シミュレーションエンジン */
+(function (G) {
+  'use strict';
+
+  // [市町村, 地域, 概算人口, 出生の傾向係数]
+  const MUNIS = [
+    ['鳥取市', '東部', 182000, 1.05], ['米子市', '西部', 143000, 1.12], ['倉吉市', '中部', 43000, 0.95],
+    ['境港市', '西部', 31500, 0.95], ['岩美町', '東部', 10000, 0.8], ['若桜町', '東部', 2800, 0.6],
+    ['智頭町', '東部', 6200, 0.7], ['八頭町', '東部', 15500, 0.85], ['三朝町', '中部', 5700, 0.75],
+    ['湯梨浜町', '中部', 16000, 1.15], ['琴浦町', '中部', 15500, 0.85], ['北栄町', '中部', 13500, 0.95],
+    ['日吉津村', '西部', 3600, 1.3], ['大山町', '西部', 15000, 0.8], ['南部町', '西部', 10000, 0.85],
+    ['伯耆町', '西部', 10000, 0.8], ['日南町', '西部', 4000, 0.55], ['日野町', '西部', 2700, 0.55],
+    ['江府町', '西部', 2600, 0.7]
+  ];
+  // 県外転出先の構成（鳥取県資料・転出先の割合）
+  const DEST = [['大阪府', 11.4], ['島根県', 10.7], ['兵庫県', 9.1], ['広島県', 8.3], ['岡山県', 8.2],
+    ['東京都', 7.2], ['京都府', 6], ['神奈川県', 4.5], ['愛知県', 4.5], ['福岡県', 4], ['その他', 26.1]];
+  const DEST_OTHER = ['埼玉県', '千葉県', '山口県', '香川県', '滋賀県', '奈良県', '愛媛県', '北海道', '宮城県', '静岡県'];
+  const STUDY_DEST = [['大阪府', 18], ['岡山県', 13], ['広島県', 12], ['兵庫県', 12], ['京都府', 11], ['島根県', 8], ['東京都', 9], ['その他', 17]];
+
+  // お産ができる病院・診療所（出産なび 2024年実績の件数帯の中央値を重みに。*は件数の公表なし・概算）
+  const HOSP = {
+    東部: [['さくらレディースクリニック田園町', '鳥取市', 440], ['みやもと産婦人科医院', '鳥取市', 375], ['鳥取産院', '鳥取市', 280], ['鳥取県立中央病院', '鳥取市', 350], ['鳥取赤十字病院', '鳥取市', 20]],
+    中部: [['打吹公園クリニック', '倉吉市', 360], ['鳥取県立厚生病院', '倉吉市', 340]],
+    西部: [['母と子の長田産科婦人科クリニック', '米子市', 380], ['山陰労災病院', '米子市', 340], ['鳥取大学医学部附属病院', '米子市', 350], ['鎌沢マタニティークリニック', '米子市', 200], ['中曽産科婦人科医院', '米子市', 185], ['彦名レディスライフクリニック', '米子市', 150]]
+  };
+  // 赤ちゃんの治療が必要なお産は、各地域の周産期医療を担う病院で
+  const PERINATAL = { 東部: ['鳥取県立中央病院', '鳥取市'], 中部: ['鳥取県立厚生病院', '倉吉市'], 西部: ['鳥取大学医学部附属病院', '米子市'] };
+
+  // 市町村ごとの祭り [名前, 出来事] と観光名所
+  const LOCAL = {
+    鳥取市: { fest: [['鳥取しゃんしゃん祭', '鳥取しゃんしゃん祭で、傘踊りの列を見に行った。'], ['用瀬の流しびな', '用瀬の流しびなで、ひな人形を千代川に流した。'], ['鹿野祭り', '鹿野祭りで、城下町を練り歩く行列を見た。']],
+      spots: ['鳥取砂丘', '砂の美術館', '鳥取城跡と仁風閣', '白兎神社', 'わらべ館', '湖山池', '浜村温泉', '鹿野の城下町', '吉岡温泉', '賀露のかろいち'] },
+    米子市: { fest: [['米子がいな祭', '米子がいな祭の花火を見上げた。'], ['皆生トライアスロン', '皆生トライアスロンの選手に、沿道から声援を送った。']],
+      spots: ['皆生温泉', '米子城跡', '米子水鳥公園', '加茂川沿いの寺町'] },
+    倉吉市: { fest: [['倉吉打吹まつり', '倉吉打吹まつりで、飛天花火を見た。'], ['倉吉春まつり', '打吹公園の桜の下で花見をした。']],
+      spots: ['白壁土蔵群', '打吹公園', '関金温泉', '倉吉博物館'] },
+    境港市: { fest: [['みなと祭', '境港のみなと祭の花火を見た。']], spots: ['水木しげるロード', '水木しげる記念館', '夢みなとタワー', '境港の水産物直売センター'] },
+    岩美町: { fest: [['浦富海岸元気フェスティバル', '浦富海岸元気フェスティバルの花火を見た。']], spots: ['浦富海岸', '岩井温泉', '網代漁港'] },
+    若桜町: { fest: [['若桜町納涼花火大会', '若桜町の納涼花火大会に出かけた。']], spots: ['若桜駅の蒸気機関車', '蔵通りと仮屋の町並み', '氷ノ山'] },
+    智頭町: { fest: [['諏訪神社の柱祭り', '智頭の諏訪神社の柱祭りで、大きな柱が立てられるのを見上げた。']], spots: ['智頭宿と石谷家住宅', '芦津渓谷', '智頭の杉の森'] },
+    八頭町: { fest: [['八頭町きらめき祭', '八頭町きらめき祭に出かけた。']], spots: ['若桜鉄道の隼駅', '隼Lab.', '船岡竹林公園', '大江ノ郷'] },
+    三朝町: { fest: [['花湯まつり', '三朝の花湯まつりで、陣所の大綱引きに加わった。']], spots: ['三朝温泉の河原風呂', '三徳山三佛寺投入堂'] },
+    湯梨浜町: { fest: [['湯梨浜夏まつり 水郷祭', '東郷湖の水郷祭で、湖に上がる花火を見た。']], spots: ['東郷湖', 'はわい温泉', '燕趙園'] },
+    琴浦町: { fest: [['波止のまつり', '赤碕の波止のまつりに出かけた。']], spots: ['鳴り石の浜', '船上山', '一向平と大山滝'] },
+    北栄町: { fest: [['北栄砂丘まつり', '北栄砂丘まつりに出かけた。'], ['北条節句祭り', '北条節句祭りに出かけた。']], spots: ['青山剛昌ふるさと館', 'コナン大橋', '北条砂丘の風車'] },
+    日吉津村: { fest: [], spots: ['イオンモール日吉津'] },
+    大山町: { fest: [['大山夏山開き祭', '大山夏山開き祭の前夜、たいまつ行列の灯りが参道を下っていくのを見た。']], spots: ['大山', '大山寺と大神山神社奥宮', '御来屋漁港'] },
+    南部町: { fest: [['緑水湖の桜', '緑水湖のほとりで花見をした。']], spots: ['とっとり花回廊', '緑水湖'] },
+    伯耆町: { fest: [], spots: ['植田正治写真美術館', '桝水高原'] },
+    日南町: { fest: [['福寿草の季節', '日南町の福寿草が咲き始めた。春が近い。']], spots: ['日南町の福寿草の里', '日南町美術館'] },
+    日野町: { fest: [['根雨まつり', '根雨まつりの花火を見た。']], spots: ['金持神社', '根雨のおしどり観察小屋'] },
+    江府町: { fest: [['江尾十七夜', '江尾十七夜に出かけた。夏の夜の町がにぎわっていた。']], spots: ['奥大山', '木谷沢渓流', '鏡ヶ成'] }
+  };
+  const ICONS = ['鳥取砂丘', '大山', '水木しげるロード', '三朝温泉', '白壁土蔵群', '浦富海岸'];
+
+  // 世代（呼び方や区切りには諸説あり。ゲーム用の区切り）
+  const GENS = [
+    { id: 'senchu', name: '戦中・戦後すぐ', from: 1925, to: 1946, desc: '戦争と復興のなかで育つ' },
+    { id: 'dankai', name: '団塊の世代', from: 1947, to: 1949, desc: '子どもがいちばん多かった世代。中学を出て働く人も多い' },
+    { id: 'y1950', name: '1950〜1964年生まれ', from: 1950, to: 1964, desc: '高度成長期に育つ', hidden: true },
+    { id: 'bubble', name: 'バブル世代', from: 1965, to: 1970, desc: '好景気で就職は売り手市場' },
+    { id: 'hyogaki', name: '就職氷河期世代', from: 1971, to: 1984, desc: '卒業のころ、正社員の求人が激減した' },
+    { id: 'yutori', name: 'ゆとり世代（ミレニアル）', from: 1985, to: 1996, desc: '週5日制の学校で育ち、携帯電話とともに大人になる' },
+    { id: 'z', name: 'Z世代', from: 1997, to: 2012, desc: '物心ついたときからスマホとSNSがある' },
+    { id: 'alpha', name: 'α世代', from: 2013, to: 2025, desc: '1人1台のタブレットと生成AIが当たり前' },
+    { id: 'next', name: 'これから生まれる世代', from: 2026, to: 2045, desc: 'AIとともに生きる未来（想像を含む）' }
+  ];
+  function genOf(y) { return GENS.find(g => y >= g.from && y <= g.to) || GENS[GENS.length - 1]; }
+  // 大卒求人倍率（リクルートワークス研究所、3月卒）
+  const JOBRATIO = [[1987, 2.34], [1988, 2.48], [1989, 2.68], [1990, 2.77], [1991, 2.86], [1992, 2.41], [1993, 1.91], [1994, 1.55], [1995, 1.20], [1996, 1.08], [1997, 1.45], [1998, 1.68], [1999, 1.25], [2000, 0.99], [2001, 1.09], [2002, 1.33], [2003, 1.30], [2004, 1.35], [2005, 1.37], [2006, 1.60], [2007, 1.89], [2008, 2.14], [2009, 2.14], [2010, 1.62], [2011, 1.28], [2012, 1.23]];
+  function jobRatio(y) { const r = JOBRATIO.find(x => x[0] === y); return r ? r[1] : null; }
+  function market(y) { const r = jobRatio(y); if (r) return clamp(0.7 + 0.15 * r, 0.8, 1.15); if (y < 1987 && y >= 1960) return 1.08; if (y === 2020 || y === 2021) return 0.95; return 1; }
+  // リモート勤務のしやすさ（ゲーム用の見積もり。将来は想像）
+  const REMOTE = [[2019, 0], [2020, 0.25], [2026, 0.35], [2035, 0.55], [2045, 0.7]];
+
+  // 年ごとのはやり・暮らしの変化 [から, まで, 最小年齢, 最大年齢, 文, 条件]
+  const TRENDS = [
+    [1946, 1955, 4, 12, '紙芝居のおじさんが来ると、水あめを握りしめて走った。'],
+    [1950, 1962, 4, 70, '夜はラジオの前に家族が集まった。'],
+    [1959, 1962, 3, 70, 'ご成婚のパレードを見ようと、近所にテレビが入った家に人が集まった。'],
+    [1963, 1972, 5, 13, 'テレビの漫画を見るために、夕方は走って家に帰った。'],
+    [1970, 1970, 5, 60, '大阪万博へ。人の多さに驚いた。', 'tottori'],
+    [1965, 1975, 15, 40, '家にカラーテレビと冷蔵庫と車がそろった。'],
+    [1978, 1980, 8, 25, '喫茶店のインベーダーゲームに夢中になった。'],
+    [1979, 1985, 12, 30, 'ウォークマンで音楽を聴きながら、自転車で通学した。'],
+    [1983, 1990, 6, 18, 'ファミコンを持っている友達の家に、放課後みんなで集まった。'],
+    [1987, 1991, 18, 35, 'バブル景気。給料もボーナスも上がり、街は浮かれていた。'],
+    [1989, 1989, 18, 80, '消費税が始まった。3%。'],
+    [1991, 1993, 20, 60, 'バブルがはじけた。景気の話が暗くなっていった。'],
+    [1995, 1999, 13, 22, 'ポケベルで友達と数字の暗号を送り合った。'],
+    [1995, 1999, 12, 22, 'ゲームセンターでプリクラを撮るのが週末の楽しみだった。'],
+    [1996, 1998, 6, 14, 'たまごっちを育てるのに夢中になった。'],
+    [1996, 2000, 6, 14, 'ポケモンのカードとゲームが、教室の話題の中心だった。'],
+    [2000, 2007, 13, 30, '携帯電話で写メを撮って、メールに添付して送った。'],
+    [2002, 2002, 6, 15, '学校が完全週5日制になった。土曜日が休みに。'],
+    [2004, 2010, 13, 30, 'mixiの日記に、毎日のできごとを書いた。'],
+    [2008, 2013, 13, 45, '初めてのスマートフォンを手に入れた。'],
+    [2011, 2016, 12, 60, 'LINEで家族や友達と連絡をとるようになった。'],
+    [2014, 2022, 10, 25, '動画配信者にあこがれて、自分でも動画を撮ってみた。'],
+    [2018, 2024, 12, 25, 'ショート動画を見ているうちに、夜が更けていた。'],
+    [2021, 2021, 6, 15, '学校で1人1台のタブレットが配られた。'],
+    [2023, 2026, 10, 40, '生成AIに宿題や仕事を手伝ってもらう人が、まわりで増えてきた。'],
+    [2027, 2045, 5, 15, 'AIの先生と一緒に勉強するのが当たり前になっていた。（未来の想像）'],
+    [2030, 2050, 15, 90, '自動運転のバスが、山あいの集落まで来るようになった。（未来の想像）', 'tottori'],
+    [2030, 2055, 22, 60, 'AIのおかげで仕事のやり方が大きく変わり、働く時間が短くなった。（未来の想像）'],
+    [2035, 2060, 60, 95, '見守りロボットが、ひとり暮らしの家を訪ねてくるようになった。（未来の想像）'],
+    [2028, 2060, 22, 50, '東京の会社に勤めながら、鳥取の海の近くで暮らす人が珍しくなくなった。（未来の想像）', 'tottori']
+  ];
+
+  // 株式の年ごとの値動き（日経平均の年間騰落率をもとにした概算。1986年より前と2026年以降はランダム）
+  const MARKET_RET = { 1986: 0.43, 1987: 0.15, 1988: 0.39, 1989: 0.29, 1990: -0.39, 1991: -0.04, 1992: -0.26, 1993: 0.03, 1994: 0.13, 1995: 0.01, 1996: -0.03, 1997: -0.21, 1998: -0.09, 1999: 0.37, 2000: -0.27, 2001: -0.24, 2002: -0.19, 2003: 0.25, 2004: 0.08, 2005: 0.40, 2006: 0.07, 2007: -0.11, 2008: -0.42, 2009: 0.19, 2010: -0.03, 2011: -0.17, 2012: 0.23, 2013: 0.57, 2014: 0.07, 2015: 0.09, 2016: 0.00, 2017: 0.19, 2018: -0.12, 2019: 0.18, 2020: 0.16, 2021: 0.05, 2022: -0.09, 2023: 0.28, 2024: 0.19, 2025: 0.15 };
+  function mret(y) { if (MARKET_RET[y] !== undefined) return MARKET_RET[y]; return Math.max(-0.5, (y < 1986 ? 0.04 : 0.035) + gauss() * 0.16); }
+  const EXP_K = 1.4; // 生活費の水準（鳥取市の家計調査の支出の大きさに近づけた係数）
+  const PENSION_KOSEI = 179, PENSION_KOKUMIN = 65; // 年額（万円）。平均月額 約14.9万円・約5.4万円から
+
+  // 夢カード
+  const DAISEN_VIEW = ['米子市', '大山町', '伯耆町', '日吉津村', '南部町', '江府町', '琴浦町', '境港市'];
+  const DREAMS = {
+    tokyo: { name: '東京で働く', hint: '県外に出る選択をするとき、東京に行きやすくなる', rare: 2, check: L => L.workedTokyo },
+    shop: { name: '自分の店をもつ', hint: '働き盛りに独立のチャンスが来たら', rare: 2, check: L => L.opened },
+    daisen: { name: '大山の見える家に住む', hint: '県西部や中部で家を建てる', rare: 2, check: L => L.house === 'tottori' && DAISEN_VIEW.includes(L.housePlace) },
+    grand: { name: '孫に囲まれて暮らす', hint: '子どもをもち、長生きする', rare: 1, check: L => L.grand && L.kids >= 2 },
+    home: { name: '生まれた町で、ずっと暮らす', hint: '一度も鳥取を出ずに人生を終える', rare: 2, end: true, check: L => !L.everLeft },
+    uturn: { name: '都会で経験を積んで、鳥取に帰る', hint: '県外で働いたあと、鳥取に戻る', rare: 2, check: L => L.workedOut && L.returned > 0 && L.loc === 'tottori' },
+    rich: { name: '年収600万円をこえる', hint: '学歴、業種、働く場所しだい', rare: 2, check: L => L.peak >= 600 },
+    teacher: { name: '学校の先生になる', hint: '大学に進むと近づく', rare: 2, check: L => L.everInd.has('教育，学習支援業') },
+    nurse: { name: '人の命や暮らしを支える仕事に就く', hint: '医療や福祉の仕事。看護の学校が近道', rare: 1, check: L => L.everInd.has('医療，福祉') },
+    farm: { name: '鳥取の田畑や海で働く', hint: '鳥取で働くと近づく', rare: 2, check: L => L.everInd.has('農業，林業') || L.everInd.has('漁業') },
+    hundred: { name: '100歳を迎える', hint: '時代と運しだい', rare: 3, check: L => L.age >= 100 },
+    pro: { name: 'プロのスポーツ選手になる', hint: '子どもの頃からスポーツを続けると挑戦できる。めったに叶わない', rare: 3, check: L => L.pro },
+    kids3: { name: '子ども3人の家族をつくる', hint: '結婚して、子どもをもつ選択を重ねる', rare: 2, check: L => L.kids >= 3 },
+    univ: { name: '県外の大学を卒業する', hint: '18歳の進路しだい', rare: 1, check: L => L.outGrad }
+  };
+
+  // 市町村ごとの中学校・義務教育学校 [名前, 生徒数(重み), 義務教育学校か]（令和7年度 学級編制資料ほか）
+  const JHS = {
+    鳥取市: [['東中学校', 438], ['西中学校', 297], ['南中学校', 650], ['北中学校', 417], ['高草中学校', 256], ['湖東中学校', 589], ['桜ケ丘中学校', 465], ['中ノ郷中学校', 410], ['国府中学校', 166], ['河原中学校', 146], ['千代南中学校', 83], ['気高中学校', 178], ['青谷中学校', 69], ['湖南学園', 50, 1], ['福部未来学園', 50, 1], ['鹿野学園', 60, 1], ['江山学園', 110, 1]],
+    米子市: [['東山中学校', 367], ['福生中学校', 407], ['福米中学校', 567], ['湊山中学校', 331], ['後藤ヶ丘中学校', 499], ['美保中学校', 157], ['弓ヶ浜中学校', 321], ['尚徳中学校', 216], ['加茂中学校', 337], ['淀江中学校', 252], ['箕蚊屋中学校', 429]],
+    倉吉市: [['東中学校', 262], ['西中学校', 302], ['久米中学校', 128], ['河北中学校', 344], ['鴨川中学校', 69]],
+    境港市: [['第一中学校', 267], ['第二中学校', 273], ['第三中学校', 266]],
+    岩美町: [['岩美中学校', 1]], 八頭町: [['八頭中学校', 1]], 若桜町: [['若桜学園', 1, 1]], 智頭町: [['智頭中学校', 1]],
+    湯梨浜町: [['湯梨浜中学校', 1]], 三朝町: [['三朝中学校', 1]], 北栄町: [['北条中学校', 206], ['大栄中学校', 190]], 琴浦町: [['東伯中学校', 241], ['赤碕中学校', 167]],
+    日吉津村: [['箕蚊屋中学校', 1]], 大山町: [['大山中学校', 148], ['名和中学校', 134], ['中山中学校', 65]], 南部町: [['法勝寺中学校', 157], ['南部中学校', 95]],
+    伯耆町: [['岸本中学校', 190], ['溝口中学校', 75]], 日南町: [['日南中学校', 1]], 日野町: [['日野中学校', 1]], 江府町: [['奥大山江府学園', 1, 1]]
+  };
+  const JHS_PRIVATE = { 東部: [['鳥取大学附属中学校', 4], ['青翔開智中学校', 1.2]], 中部: [['湯梨浜学園中学校', 0.8]], 西部: [['米子北斗中学校', 2]] };
+  const VOC = /商業|工業高校|農林|農業|総合産業|総合技術|湖陵/;
+  function pickJHS(muni, region, y) {
+    if (y < 2005) return { name: `${muni}の中学校`, generic: true };
+    const priv = (JHS_PRIVATE[region] || []).filter(x => !(x[0] === '青翔開智中学校' && y < 2014));
+    const pPriv = priv.reduce((t, x) => t + x[1], 0) / 100;
+    if (priv.length && R() < pPriv) return { name: pickW(priv), priv: true };
+    const list = JHS[muni].filter(x => !(x[2] && y < 2017));
+    if (!list.length) return { name: muni.replace(/[町村]$/, '') + '中学校' };
+    const j = pickW(list.map(x => [x, x[1]]));
+    return { name: j[0], gimu: !!j[2] };
+  }
+
+  // 県内の高校（全日制・高専・定時制/通信制）。重みは学校規模の概算
+  const HS = {
+    東部: [['鳥取東高校', 6], ['鳥取西高校', 6], ['鳥取商業高校', 4], ['鳥取工業高校', 4], ['鳥取湖陵高校', 4], ['青谷高校', 1.5], ['岩美高校', 2], ['八頭高校', 4], ['智頭農林高校', 1.5], ['鳥取敬愛高校', 3], ['鳥取城北高校', 4], ['青翔開智高校', 1], ['鳥取緑風高校', 1.2], ['米子工業高等専門学校', 0.6]],
+    中部: [['倉吉東高校', 5], ['倉吉西高校', 4], ['倉吉農業高校', 2], ['倉吉総合産業高校', 3], ['鳥取中央育英高校', 4], ['倉吉北高校', 2], ['湯梨浜学園高校', 1], ['米子工業高等専門学校', 1]],
+    西部: [['米子東高校', 6], ['米子西高校', 5], ['米子高校', 4], ['米子南高校', 4], ['米子工業高校', 4], ['境高校', 4], ['境港総合技術高校', 3], ['日野高校', 1], ['米子北高校', 4], ['米子北斗高校', 3], ['米子松蔭高校', 3], ['米子白鳳高校', 1.2], ['米子工業高等専門学校', 3]]
+  };
+  // 県内の大学・短大・専門学校 [名前, 所在地, 年数, 重み, 進む業種(任意)]
+  const UNIV4 = [['鳥取大学', '鳥取市', 4, 60], ['公立鳥取環境大学', '鳥取市', 4, 25], ['鳥取看護大学', '倉吉市', 4, 15, '医療，福祉']];
+  const UNIV2 = [['鳥取短期大学', '倉吉市', 2, 30], ['鳥取県立鳥取看護専門学校', '鳥取市', 3, 8, '医療，福祉'], ['鳥取県立倉吉総合看護専門学校', '倉吉市', 3, 7, '医療，福祉'],
+    ['米子医療センター附属看護学校', '米子市', 3, 6, '医療，福祉'], ['鳥取市医療看護専門学校', '鳥取市', 3, 7, '医療，福祉'], ['鳥取県立歯科衛生専門学校', '鳥取市', 3, 5, '医療，福祉'],
+    ['鳥取県立農業大学校', '倉吉市', 2, 6, '農業，林業'], ['鳥取県理容美容専門学校', '鳥取市', 2, 7, '生活関連サービス業，娯楽業'],
+    ['日本海情報ビジネス専門学校', '米子市', 2, 10], ['鳥取社会福祉専門学校', '鳥取市', 2, 6, '医療，福祉']];
+  // 産業別就業者の割合（令和2年国勢調査・鳥取県）と賃金の相対係数（概算）
+  const INDUSTRY = [['医療，福祉', 16.3, 0.95], ['卸売業，小売業', 14.5, 0.92], ['製造業', 13.4, 1.0], ['農業，林業', 7.3, 0.8], ['建設業', 7.7, 1.02],
+    ['サービス業', 5.9, 0.85], ['教育，学習支援業', 5.5, 1.15], ['公務', 5.2, 1.2], ['宿泊業，飲食サービス業', 5.1, 0.75], ['運輸業，郵便業', 4.1, 0.97],
+    ['生活関連サービス業，娯楽業', 3.1, 0.8], ['学術研究，専門・技術サービス業', 2.4, 1.15], ['金融業，保険業', 2.2, 1.15], ['情報通信業', 1.2, 1.15],
+    ['不動産業，物品賃貸業', 1.1, 1.0], ['複合サービス事業', 1.1, 0.95], ['電気・ガス・水道業', 0.5, 1.3], ['漁業', 0.4, 0.85]];
+  const IND_F = Object.fromEntries(INDUSTRY.map(x => [x[0], x[2]]));
+  const TOTTORI_WAGE = 452; // 万円。令和5年賃金構造基本統計調査（鳥取県・一般労働者の年収換算）
+  const PREF_WAGE = { 東京都: 1.35, 神奈川県: 1.25, 大阪府: 1.2, 愛知県: 1.2, 京都府: 1.12, 兵庫県: 1.12, 広島県: 1.1, 埼玉県: 1.12, 千葉県: 1.12, 福岡県: 1.07, 岡山県: 1.05, 滋賀県: 1.1, 静岡県: 1.08, 島根県: 0.98 };
+  // 年齢別の賃金カーブ（全国・一般労働者の所定内給与の形、千円）
+  const CURVE = {
+    m: [[19, 190], [24, 230], [29, 264], [34, 298], [39, 333], [44, 360], [49, 381], [54, 408], [59, 413], [64, 323], [99, 278]],
+    f: [[19, 185], [24, 225], [29, 251], [34, 263], [39, 275], [44, 282], [49, 285], [54, 290], [59, 283], [64, 248], [99, 225]]
+  };
+  function curve(sex, age) { for (const [hi, v] of CURVE[sex]) if (age <= hi) return v / 318; return 0.8; }
+  function gauss() { let u = 0, v = 0; while (!u) u = R(); while (!v) v = R(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+
+  const LIFE_EXP = { m: 81.34, f: 87.91 };       // 令和2年 都道府県別生命表（鳥取）
+  const Q0 = 0.0018;                              // 乳児死亡（全国水準）
+  const GOMPERTZ_B = { m: 0.102, f: 0.118 };
+  const EVER_MARRIED = { m: 0.74, f: 0.84 };      // 50歳時に結婚経験がある割合（概算）
+  const UTURN = { m: 0.296, f: 0.399, all: 0.351 }; // 県外大学卒業者の県内就職率 R6.3
+  const UTURN_WISH = 0.744;                       // 戻りたい・将来戻りたい（県意識調査）
+  const SHINRO = { out_univ: 0.50, in_univ: 0.21, in_job: 0.20, out_job: 0.055 };
+  const KAKEI = [['苦しい', 59.6], ['ふつう', 35.8], ['ゆとりがある', 4.6]];
+  const SURNAMES = ['田中', '山本', '松本', '前田', '中村', '小林', '岸本', '山根', '西村', '谷口', '福田', '浜田', '竹本', '森'];
+  const NAMES = {
+    m: ['蓮', '陽翔', '湊', '蒼', '樹', '大和', '悠真', '朝陽', '律', '颯太', '海斗', '湊斗'],
+    f: ['陽葵', '凛', '紬', '芽依', '葵', '結菜', 'さくら', '澪', '心春', '杏', '美月', '楓']
+  };
+
+  const R = Math.random;
+  function pickW(list) { // [[val, weight],...]
+    let t = 0; for (const x of list) t += x[1];
+    let r = R() * t;
+    for (const x of list) { r -= x[1]; if (r <= 0) return x[0]; }
+    return list[list.length - 1][0];
+  }
+  function pick(arr) { return arr[Math.floor(R() * arr.length)]; }
+  function clamp(x, a, b) { return Math.max(a, Math.min(b, x)); }
+
+  // --- 死亡率：年ごとの平均寿命（全国の完全生命表、2020年は鳥取県、2045年以降は将来推計の概算）に合わせて校正 ---
+  // [年, 男, 女, 乳児死亡率, 若い世代の死亡の高さ]
+  const ERA = [[1923, 42.06, 43.20, 0.16, 12], [1935, 46.92, 49.63, 0.107, 10], [1947, 50.06, 53.96, 0.077, 7], [1951, 59.57, 62.97, 0.06, 4],
+    [1955, 63.60, 67.75, 0.04, 2.6], [1960, 65.32, 70.19, 0.031, 2], [1965, 67.74, 72.92, 0.0185, 1.6], [1970, 69.31, 74.66, 0.013, 1.4],
+    [1975, 71.73, 76.89, 0.010, 1.3], [1980, 73.35, 78.76, 0.0075, 1.2], [1985, 74.78, 80.48, 0.0055, 1.15], [1990, 75.92, 81.90, 0.0046, 1.1],
+    [1995, 76.38, 82.85, 0.0043, 1.1], [2000, 77.72, 84.60, 0.0032, 1.05], [2005, 78.56, 85.52, 0.0028, 1.05], [2010, 79.55, 86.30, 0.0023, 1.0],
+    [2015, 80.75, 86.99, 0.0019, 1.0], [2020, 81.34, 87.91, 0.0018, 1.0], [2045, 83.3, 89.6, 0.0015, 0.95], [2070, 85.9, 91.9, 0.0012, 0.9]];
+  function baseC(age, k) { return age < 5 ? 0.00015 * k * k : age < 15 ? 0.00012 * k : age < 40 ? 0.00035 * k : 0.0005 * Math.sqrt(k); }
+  function hazardWith(A, sex, age, q0, k) {
+    if (age === 0) return q0;
+    return 1 - Math.exp(-(A * Math.exp(GOMPERTZ_B[sex] * age) + baseC(age, k)));
+  }
+  function e0(A, sex, q0, k) {
+    let s = 1, e = 0;
+    for (let a = 0; a < 125; a++) { const q = hazardWith(A, sex, a, q0, k); e += s * (1 - q / 2); s *= 1 - q; }
+    return e;
+  }
+  const ERA_A = ERA.map(([y, em, ef, q0, k]) => {
+    const out = { y, q0, k };
+    for (const [sex, t] of [['m', em], ['f', ef]]) {
+      let lo = 1e-8, hi = 0.05;
+      for (let i = 0; i < 90; i++) { const mid = Math.sqrt(lo * hi); if (e0(mid, sex, q0, k) > t) lo = mid; else hi = mid; }
+      out[sex] = Math.sqrt(lo * hi);
+    }
+    return out;
+  });
+  function eraParams(year) {
+    if (year <= ERA_A[0].y) return ERA_A[0];
+    for (let i = 1; i < ERA_A.length; i++) {
+      const b = ERA_A[i];
+      if (year <= b.y) {
+        const a = ERA_A[i - 1], t = (year - a.y) / (b.y - a.y);
+        return { q0: a.q0 + (b.q0 - a.q0) * t, k: a.k + (b.k - a.k) * t, m: Math.exp(Math.log(a.m) + (Math.log(b.m) - Math.log(a.m)) * t), f: Math.exp(Math.log(a.f) + (Math.log(b.f) - Math.log(a.f)) * t) };
+      }
+    }
+    return ERA_A[ERA_A.length - 1];
+  }
+  function qx(sex, age, year) {
+    if (age >= 119) return 1;
+    const P = eraParams(year === undefined ? 2020 : year);
+    return hazardWith(P[sex], sex, age, P.q0, P.k);
+  }
+  function interp(tbl, y) {
+    if (y <= tbl[0][0]) return tbl[0][1];
+    for (let i = 1; i < tbl.length; i++) if (y <= tbl[i][0]) { const [a, va] = tbl[i - 1], [b, vb] = tbl[i]; return va + (vb - va) * (y - a) / (b - a); }
+    return tbl[tbl.length - 1][1];
+  }
+  // 時代の表（全国の推移などをもとにした概算）
+  const HS_RATE = [[1935, 0.2], [1948, 0.4], [1950, 0.425], [1955, 0.515], [1960, 0.577], [1965, 0.707], [1970, 0.821], [1975, 0.919], [1980, 0.942], [1990, 0.951], [2000, 0.97], [2025, 0.979]];
+  const WAGE_ERA = [[1925, 0.2], [1950, 0.25], [1960, 0.4], [1970, 0.65], [1980, 0.82], [1990, 0.95], [1997, 1.02], [2020, 1.0], [2045, 1.1]];
+  const AGRI = [[1950, 45], [1960, 33], [1970, 22], [1980, 15], [1990, 11], [2000, 9], [2020, 7.3]];
+  const MEDI = [[1950, 2], [1980, 5], [2000, 10], [2020, 16.3]];
+  const HOME_BIRTH = [[1949, 0.95], [1955, 0.82], [1960, 0.5], [1965, 0.16], [1970, 0.04], [1975, 0.01], [1980, 0]];
+  // 鳥取県の出生数（県人口×全国の出生率などによる概算。2023年は実績、2030年以降は推計）
+  const BIRTHS = [[1925, 16500], [1935, 15500], [1947, 20000], [1950, 16900], [1955, 11900], [1960, 10300], [1965, 10800], [1970, 10700], [1975, 9900], [1980, 8200], [1990, 6200], [2000, 5800], [2010, 4900], [2020, 3800], [2023, 3263], [2030, 2900], [2045, 2400]];
+  function shinroW(y) {
+    if (y < 1955) return { out_univ: 6, in_univ: 4, in_job: 62, out_job: 28 };
+    if (y < 1975) return { out_univ: 14, in_univ: 8, in_job: 43, out_job: 35 };
+    if (y < 1995) return { out_univ: 30, in_univ: 14, in_job: 42, out_job: 14 };
+    if (y < 2015) return { out_univ: 45, in_univ: 20, in_job: 27, out_job: 8 };
+    return { out_univ: 50, in_univ: 21, in_job: 20, out_job: 5.5 };
+  }
+  function everMarried(sex, by) {
+    const t = sex === 'm' ? [[1935, 0.97], [1945, 0.95], [1955, 0.9], [1965, 0.8], [1975, 0.74], [2000, 0.72]] : [[1935, 0.97], [1945, 0.96], [1955, 0.93], [1965, 0.88], [1975, 0.84], [2000, 0.82]];
+    return interp(t, by);
+  }
+  function kidsDist(by) {
+    if (by < 1935) return [[0, 4], [1, 8], [2, 20], [3, 28], [4, 22], [5, 18]];
+    if (by < 1950) return [[0, 4], [1, 10], [2, 50], [3, 30], [4, 6]];
+    return [[0, 12], [1, 20], [2, 45], [3, 20], [4, 3]];
+  }
+  // 施設・行事ができた年（その年より前には出さない。一部は概算）
+  const SINCE = { '鳥取しゃんしゃん祭': 1965, '米子がいな祭': 1974, '皆生トライアスロン': 1981, '水木しげるロード': 1993, '水木しげる記念館': 2003, '夢みなとタワー': 1997,
+    '砂の美術館': 2006, '青山剛昌ふるさと館': 2007, 'コナン大橋': 2007, '隼Lab.': 2017, '燕趙園': 1995, 'とっとり花回廊': 1999, 'わらべ館': 1995, '植田正治写真美術館': 1995,
+    '賀露のかろいち': 2003, '大江ノ郷': 2005, 'イオンモール日吉津': 2000, '北栄砂丘まつり': 2006, '八頭町きらめき祭': 2006, '湯梨浜夏まつり 水郷祭': 2005,
+    '浦富海岸元気フェスティバル': 1990, '日南町美術館': 2000, '北条砂丘の風車': 2005, '若桜駅の蒸気機関車': 2008, '米子水鳥公園': 1995, '倉吉博物館': 1975, '境港の水産物直売センター': 1985 };
+  const MERGED = { 八頭町: 2005, 湯梨浜町: 2004, 北栄町: 2005, 琴浦町: 2004, 南部町: 2004, 伯耆町: 2005, 大山町: 2005 };
+
+  // --- 結婚：初婚年齢の山を 29.5歳付近に置き、50歳時の結婚経験率に合わせる ---
+  function marGauss(age) { return Math.exp(-((age - 29.5) ** 2) / (2 * 5.5 * 5.5)); }
+  let gsum = 0; for (let a = 18; a < 50; a++) gsum += marGauss(a);
+  const MAR_K = { m: -Math.log(1 - EVER_MARRIED.m) / gsum, f: -Math.log(1 - EVER_MARRIED.f) / gsum };
+  function marHazard(sex, age) { return age < 18 || age > 65 ? 0 : 1 - Math.exp(-MAR_K[sex] * marGauss(age)); }
+  function marHazardBy(sex, age, by) {
+    if (age < 17 || age > 65) return 0;
+    const c = by < 1950 ? (sex === 'm' ? 27 : 24) : by < 1970 ? (sex === 'm' ? 28 : 26) : 29.5;
+    let g = 0; for (let a = 17; a < 50; a++) g += Math.exp(-((a - c) ** 2) / (2 * 4.5 * 4.5));
+    const k = -Math.log(1 - everMarried(sex, by)) / g;
+    return 1 - Math.exp(-k * Math.exp(-((age - c) ** 2) / (2 * 4.5 * 4.5)));
+  }
+
+  function causeOfDeath(age, year) {
+    let t = null;
+    if (year < 1950 && age > 0 && age < 60) t = [['結核', 32], ['肺炎や感染症', 28], ['おなかの病気', 12], ['不慮の事故', 10], ['その他の病気など', 18]];
+    else if (year < 1950 && age >= 60) t = [['脳卒中', 26], ['老衰', 20], ['肺炎', 16], ['がん', 10], ['結核', 8], ['その他の病気など', 20]];
+    else if (year < 1980 && age >= 40) t = [['脳卒中', 30], ['がん', 24], ['心臓の病気', 12], ['老衰', age >= 80 ? 15 : 4], ['肺炎', 7], ['その他の病気など', 15]];
+    if (t) return pickW(t);
+    if (age === 0) t = [['生まれつきの病気', 70], ['乳幼児期の病気', 30]];
+    else if (age < 30) t = [['不慮の事故', 38], ['がん', 15], ['心臓の病気', 7], ['その他の病気など', 40]];
+    else if (age < 65) t = [['がん', 45], ['心臓の病気', 15], ['脳卒中', 8], ['不慮の事故', 5], ['その他の病気など', 27]];
+    else if (age < 85) t = [['がん', 35], ['心臓の病気', 16], ['脳卒中', 8], ['肺炎', 7], ['その他の病気など', 34]];
+    else t = [['老衰', 27], ['心臓の病気', 17], ['がん', 14], ['肺炎', 8], ['脳卒中', 7], ['その他の病気など', 27]];
+    return pickW(t);
+  }
+
+  function destPref(study) {
+    const d = pickW(study ? STUDY_DEST : DEST);
+    return d === 'その他' ? pick(DEST_OTHER) : d;
+  }
+
+  // --- 小さな出来事（場所と年齢で変わる） ---
+  const FLAVOR = {
+    kid: {
+      東部: ['しゃんしゃん祭で傘踊りを見た。', '鳥取砂丘に遠足。靴の中が砂だらけになった。', '袋川沿いの桜の下を歩いた。'],
+      中部: ['倉吉の白壁土蔵群を家族で歩いた。', '東郷池のほとりで遊んだ。', '三朝の温泉に家族で出かけた。'],
+      西部: ['がいな祭の花火を見上げた。', '大山の麓でキャンプをした。', '皆生の海で泳いだ。'],
+      all: ['大雪で学校が休みになった。', '冬、カニ汁が食卓に並んだ。', '二十世紀梨の季節が来た。', 'おじいちゃんの田んぼを手伝った。', '友達と自転車で隣町まで行った。']
+    },
+    teen: ['部活の県大会に出た。', '学校帰りに友達とイオンに寄った。', '進路の話で親とけんかした。', '電車が1時間に1本なので、時刻表を覚えた。', '「卒業したらどうする？」が合言葉になった。'],
+    tottori_adult: ['車がないとどこにも行けない毎日。', '冬タイヤに履き替えた。', '同級生と久しぶりに飲んだ。地元に残ったのは半分くらい。', '商店街の店がまたひとつ閉まった。', '県外から移住してきた人と知り合った。', '地域の草刈りに出た。', '大山がきれいに見える朝だった。', '近所の人から野菜をもらった。'],
+    out_adult: ['「鳥取ってどこ？島根の隣？」と聞かれた。', '実家から梨が一箱届いた。', 'お盆に帰省した。鳥取の夜は静かだった。', '満員電車にようやく慣れた。', '地元の友達のSNSを見て、少し帰りたくなった。', '正月に帰省した。親が少し小さくなった気がした。', '同郷の人と職場で出会い、方言で盛り上がった。'],
+    old_tottori: ['畑仕事が日課になった。', '公民館の集まりに顔を出した。', '孫に砂丘を見せに行った。', '通っていた小学校が閉校になった。'],
+    old_out: ['鳥取の家をどうするか、きょうだいと話し合った。', 'ふるさと納税で鳥取のカニを頼んだ。', '同窓会の案内が届いた。']
+  };
+
+  class Life {
+    constructor(opts) {
+      opts = opts || {};
+      this.auto = !!opts.auto;
+      this.birthYear = opts.year || 2026;
+      this.sex = R() < 105 / 205 ? 'm' : 'f';
+      const mu = pickW(MUNIS.map(m => [m, m[2] * m[3]]));
+      this.muni = mu[0]; this.region = mu[1];
+      this.surname = pick(SURNAMES); this.given = pick(NAMES[this.sex]);
+      this.kakei = (opts.year || 2026) < 1960 ? pickW([['苦しい', 55], ['ふつう', 40], ['ゆとりがある', 5]]) : pickW(KAKEI);
+      this.gaku = clamp(R() * 0.85 + (this.kakei === 'ゆとりがある' ? 0.15 : this.kakei === 'ふつう' ? 0.07 : 0), 0, 1);
+      this.order = pickW([['第1子', 45], ['第2子', 35], ['第3子', 20]]);
+      this.age = 0; this.alive = true; this.loc = 'tottori'; this.place = this.muni;
+      this.years = []; // 各年の居場所
+      this.log = []; this.pending = null; this.decisions = {};
+      this.stage = 'child'; this.edu = '中学校'; this.job = null;
+      this.married = false; this.divorced = false; this.planKids = 0; this.kids = 0; this.grand = false;
+      this.parents = { father: { age: 31 + Math.floor(R() * 7), alive: true }, mother: { age: 29 + Math.floor(R() * 6), alive: true } };
+      this.everLeft = false; this.returned = 0; this.careAsked = false; this.marks = {};
+      this.locAt30 = null; this.used = new Set();
+      this.cash = 0; this.inv = 0; this.loan = 0; this.scho = 0; this.invShare = 0; this.spend = 1; this.happy = 60; this.fin = []; this.regYears = 0; this.joblessUntil = 0; this.jobless = false; this.ui = 0; this.pensionAmt = 0; this.kidBirths = []; this.lastBroke = -99; this.lastQuit = -99; this.lastCrash = -99; this.car = false; this.sideUntil = 0;
+      this.choices = []; this.lean = null; this.internT = false; this.firstKidAge = null;
+      this.friend = { name: pick(SURNAMES) + ' ' + pick(NAMES[R() < 0.5 ? 'm' : 'f']), path: pickW([['out_univ', 50], ['in_univ', 21], ['in_job', 20], ['out_job', 5.5]]), back: null };
+      this.tie = 50; this.wageMul = 1; this.retireAge = 65; this.house = null; this.homeUntil = 0; this.asked = {}; this.selfEmp = false;
+      this.hs = null; this.jhs = null; this.schoolName = null; this.industry = null; this.regular = null; this.income = 0; this.lifetime = 0; this.peak = 0;
+      this.talent = Math.exp(gauss() * 0.15);
+      this.dream = null; this.dreamDone = false; this.everInd = new Set(); this.workedTokyo = false; this.workedOut = false; this.opened = false; this.outGrad = false; this.pro = false;
+      const by = this.birthYear;
+      this.infantDeath = R() < qx(this.sex, 0, by);
+      this.town = MERGED[this.muni] && by < MERGED[this.muni] ? `いまの${this.muni}にあたる地域` : this.muni;
+      const town = this.town;
+      const sexW = this.sex === 'm' ? '男の子' : '女の子';
+      const city = { 東部: '鳥取市', 中部: '倉吉市', 西部: '米子市' }[this.region];
+      if (R() < interp(HOME_BIRTH, by) && !this.infantDeath) {
+        this.hospital = '自宅（産婆さんの立ち会い）';
+        this.add('life', `${by}年、${town}の家で、産婆さんに取り上げられて${sexW}として生まれた。${this.order}。家の暮らし向きは「${this.kakei}」。`);
+      } else if (by < 2010) {
+        this.hospital = `${city}の病院`;
+        this.add('life', `${by}年、${city}の病院で${sexW}として生まれた。家は${town}。${this.order}。家の暮らし向きは「${this.kakei}」。`);
+      } else {
+        let hreg = this.region;
+        if (R() < 0.05) hreg = pick(['東部', '中部', '西部'].filter(r => r !== this.region));
+        const h = (this.infantDeath || R() < 0.05) ? PERINATAL[this.region] : pickW(HOSP[hreg].map(x => [x, x[2]]));
+        this.hospital = h[0];
+        this.add('life', `${by}年、${h[1]}の${h[0]}で${sexW}として生まれた。家は${town}。${this.order}。家の暮らし向きは「${this.kakei}」。`);
+      }
+      if (this.infantDeath) this.add('life', by < 1970 ? '生まれたときから体が弱かった。' : '生まれてすぐ、赤ちゃんのための集中治療室に入った。');
+    }
+    get name() { return this.surname + ' ' + this.given; }
+    get year() { return this.birthYear + this.age; }
+    outDest(study) { return (this.dream === 'tokyo' && !this.auto && R() < 0.6) ? '東京都' : destPref(study); }
+    bump(n) { this.tie = clamp(this.tie + n, 0, 100); }
+    once(id) { if (this.asked[id]) return false; this.asked[id] = true; return true; }
+    add(kind, text) { this.log.push({ age: this.age, year: this.birthYear + this.age, kind, text }); }
+    moveOut(pref, text) {
+      this.remotePref = null;
+      if (this.house === 'tottori') this.sellHouse();
+      this.loc = 'out'; this.place = pref; this.everLeft = true; this.marks[this.age] = 'out'; this.bump(-6);
+      this.add('move', text);
+    }
+    enterHS(name) {
+      this.hs = name;
+      if (name === '米子工業高等専門学校') {
+        this.add('life', this.region === '西部' ? '米子工業高等専門学校（米子高専）に入学した。' : '米子工業高等専門学校（米子高専）に入学し、寮生活を始めた。');
+        this.edu = '高専'; this.stage = 'kosen'; this.school = 'in'; this.schoolEnd = 20; this.schoolName = '米子高専';
+      } else { this.add('life', `${name}に進学した。`); this.edu = '高校'; this.stage = 'teen'; this.voc = VOC.test(name) || /実業/.test(name); }
+    }
+
+    // 仕事を決める：業種・正社員かどうか・個人差
+    startJob(industry) {
+      const y = this.year;
+      if (!industry && this.dream && !this.auto && R() < 0.4) {
+        if (this.dream === 'teacher' && this.edu === '大学') industry = '教育，学習支援業';
+        if (this.dream === 'nurse') industry = '医療，福祉';
+        if (this.dream === 'farm' && this.loc === 'tottori') industry = R() < 0.7 ? '農業，林業' : '漁業';
+      }
+      this.industry = industry || pickW(INDUSTRY.map(x => [x[0], x[0] === '農業，林業' ? interp(AGRI, y) : x[0] === '医療，福祉' ? interp(MEDI, y) : x[1]]));
+      this.everInd.add(this.industry);
+      const pReg = ((this.sex === 'm' ? 0.83 : 0.6) + (this.edu === '大学' ? 0.07 : 0) - (this.edu === '中学校' ? 0.2 : 0)) * (this.age <= 24 ? market(this.year) : 1);
+      this.regular = R() < pReg;
+      if (this.age <= 24 && !this.firstJobDone) {
+        this.firstJobDone = true;
+        const m = market(this.year), r = jobRatio(this.year);
+        if (m >= 1.1) this.add('trend', `売り手市場で、内定はすぐに出た。${r ? `（この年の大卒求人倍率は${r}倍）` : ''}`);
+        else if (m <= 0.9 && this.edu === '大学') this.add('fate', `就職氷河期。何十社受けても、なかなか内定が出なかった。${r ? `（この年の大卒求人倍率は${r}倍）` : ''}`);
+        if (!this.regular && m <= 0.9 && this.edu === '大学' && !this.auto) this.hyogakiPending = true;
+      }
+      this.jobStart = this.age;
+    }
+    wageNow() {
+      if (this.stage !== 'work' || !this.industry) return 0;
+      if (this.age < this.homeUntil || this.age < this.joblessUntil) return 0;
+      const eduF = { 大学: 1.12, 高専: 1.08, '短大・専門学校': 0.97, 高校: 0.92, 中学校: 0.85 }[this.edu] || 1;
+      const prefF = this.loc === 'tottori' ? (this.remotePref ? (PREF_WAGE[this.remotePref] || 1.1) * 0.95 : 1) : (PREF_WAGE[this.place] || 1.05);
+      const base = this.regular ? curve(this.sex, this.age) * eduF : 0.45;
+      return Math.round(TOTTORI_WAGE * base * (IND_F[this.industry] || 1) * prefF * this.talent * this.wageMul * interp(WAGE_ERA, this.year));
+    }
+    est(pref) { // 30代前半・正社員の年収の目安（万円）
+      const eduF = { 大学: 1.12, 高専: 1.08, '短大・専門学校': 0.97, 高校: 0.92, 中学校: 0.85 }[this.edu] || 1;
+      const prefF = pref === '鳥取' ? 1 : (PREF_WAGE[pref] || 1.05);
+      return Math.round(TOTTORI_WAGE * curve(this.sex, 32) * eduF * prefF * interp(WAGE_ERA, this.birthYear + 32) / 10) * 10;
+    }
+    checkDream() {
+      if (!this.dream || this.dreamDone) return;
+      const d = DREAMS[this.dream];
+      if (!d.end && d.check(this)) { this.dreamDone = true; this.add('dream', `夢が叶った。「${d.name}」`); }
+    }
+    earn() {
+      this.checkDream();
+      this.income = this.wageNow();
+      if (this.income) { if (this.place === '東京都') this.workedTokyo = true; if (this.loc === 'out') this.workedOut = true; }
+      this.lifetime += this.income;
+      if (this.income > this.peak) this.peak = this.income;
+    }
+    expenses() {
+      const e = interp(WAGE_ERA, this.year), city = this.loc === 'out';
+      const withParents = this.age < 26 && !this.married && this.loc === 'tottori' && this.place === this.muni && !this.house;
+      let base = this.married ? (city ? 290 : 240) : (city ? 190 : 150);
+      if (withParents) base = 100;
+      if (this.age >= 85) base += 40; else if (this.age >= 75) base += 15;
+      let kid = 0;
+      for (const b of this.kidBirths) { const k = this.age - b; if (k >= 0 && k < 22) { kid += 45; if (k >= 15 && k < 18) kid += 15; if (k >= 18) kid += this.childPath === 'out' ? 180 : 80; } }
+      let housing = 0;
+      if (!withParents) {
+        if (this.house && this.house === this.loc) housing = this.loan > 0 ? this.loanPay : 15 * e;
+        else housing = (this.married ? (city ? 130 : 70) : (city ? 90 : 50)) * e;
+      }
+      return Math.round((base * this.spend * EXP_K + kid) * e + housing);
+    }
+    finance() {
+      this.earn();
+      const adult = this.stage === 'work' || this.stage === 'retired';
+      if (!adult) { this.rec(); return; }
+      const e = interp(WAGE_ERA, this.year), a = this.age;
+      if (this.jobless && a >= this.joblessUntil) {
+        this.jobless = false; this.startJob(); if (R() < 0.4) this.regular = false; this.wageMul *= 0.92;
+        this.add('life', `${this.industry}の仕事に再就職した。${this.regular ? '' : '正社員ではなく、契約社員として。'}`);
+        this.income = this.wageNow();
+      }
+      let inc = this.income * 0.8;
+      if (this.ui) { inc += this.ui; this.ui = 0; }
+      if (a < this.sideUntil) inc += 60 * e;
+      if (this.married) inc += a < 65 ? (this.sex === 'm' ? 150 : 420) * e * 0.8 * (this.loc === 'out' ? 1.1 : 1) : (this.sex === 'm' ? 70 : 150) * e;
+      if (this.stage === 'retired') inc += this.pensionAmt;
+      if (this.regular && this.income > 0) this.regYears++;
+      let out = this.expenses();
+      if (this.scho > 0 && this.income > 0) { const p = Math.min(this.scho, 15 * e); out += p; this.scho -= p; if (this.scho <= 0.5) { this.scho = 0; this.add('money', '奨学金を返し終えた。'); } }
+      if (this.loan > 0 && this.house === this.loc) { this.loan = Math.max(0, this.loan - this.loanPay * 0.82); if (this.loan === 0) { this.add('money', '住宅ローンを払い終えた。'); this.happy += 5; } }
+      if (this.inv > 0) { const r = mret(this.year); this.lastRet = r; this.inv *= 1 + r; } else this.lastRet = null;
+      const surplus = inc - out;
+      if (surplus >= 0) { const put = surplus * this.invShare; this.inv += put; this.cash += surplus - put; }
+      else { this.cash += surplus; if (this.cash < 0 && this.inv > 0) { const take = Math.min(this.inv, -this.cash); this.inv -= take; this.cash += take; if (!this.soldMsg) { this.soldMsg = true; this.add('money', '生活費が足りず、投資を取り崩した。'); } } }
+      this.rec();
+    }
+    rec() {
+      this.fin[this.age] = { inc: this.income || 0, cash: Math.round(Math.max(0, this.cash)), inv: Math.round(this.inv), debt: Math.round(this.loan + this.scho + Math.max(0, -this.cash)), happy: Math.round(this.happy), y: this.year };
+    }
+    get net() { return Math.round(this.cash + this.inv - this.loan - this.scho); }
+    buyHouse() {
+      const e = interp(WAGE_ERA, this.year);
+      const price = (this.loc === 'tottori' ? 2500 : 4000) * e;
+      const down = Math.max(0, Math.min(this.cash * 0.5, price * 0.15));
+      this.cash -= down; this.housePrice = price; this.houseAge = this.age;
+      this.loan = price - down; this.loanPay = this.loan / 35 * 1.18;
+      this.add('money', `${Math.round(price)}万円の家。頭金${Math.round(down)}万円、残りは35年のローン。`);
+    }
+    sellHouse() {
+      if (!this.house) return;
+      const v = this.housePrice * Math.max(0.3, 1 - 0.025 * (this.age - this.houseAge));
+      this.cash += v - this.loan; this.add('money', `家を約${Math.round(v)}万円で売った。${this.loan > 0 ? `ローンの残り${Math.round(this.loan)}万円を返した。` : ''}`);
+      this.loan = 0; this.house = null;
+    }
+    loseJob(text) {
+      this.add('fate', text); this.happy -= 15;
+      this.ui = Math.round(this.income * 0.5); this.joblessUntil = this.age + 1 + (R() < 0.4 ? 1 : 0); this.jobless = true;
+    }
+    lifeEvents() {
+      const a = this.age, y = this.year, e = interp(WAGE_ERA, y);
+      this.happy += (60 - this.happy) * 0.12;
+      if (this.cash < -50 * e) this.happy -= 4;
+      const ev = (p, fn) => { if (R() < p) { fn(); return true; } return false; };
+      if (a >= 13 && a <= 17 && this.bukatsu === 'sport' && ev(0.05, () => { this.happy -= 6; this.add('fate', '部活でレギュラーから外された。悔しくて、ひとりで練習を続けた。'); })) return;
+      if (a >= 16 && a <= 32 && !this.married && ev(0.05, () => { this.happy -= 8; this.add('fate', pick(['好きだった人に振られた。', '付き合っていた人と別れた。しばらく何も手につかなかった。', '告白したが、返事はもらえなかった。'])); })) return;
+      if (this.stage === 'work' && this.income > 0) {
+        if (a >= 22 && ev(0.035, () => { this.happy -= 5; this.add('fate', pick(['仕事で大きなミスをして、取引先に頭を下げて回った。', '任された企画が失敗に終わった。', '上司とうまくいかず、毎朝会社に行くのがつらかった。', '大事な商談がまとまらず、眠れない夜が続いた。'])); })) return;
+        if (a >= 30 && a <= 58 && this.regular && !this.selfEmp && ev(0.04, () => { this.wageMul *= 1.06; this.happy += 6; this.add('joy', '昇進した。肩書きと一緒に、責任も重くなった。'); })) return;
+        if (a >= 35 && a <= 58 && this.regular && !this.selfEmp && ev(0.02, () => { this.wageMul *= 0.96; this.happy -= 8; this.add('fate', '昇進を見送られ、後輩が先に上の役職についた。'); })) return;
+        const rs = ((y >= 1998 && y <= 2003) || (y >= 2008 && y <= 2010)) ? 0.022 : 0.007;
+        if (a >= 25 && a <= 60 && !this.selfEmp && !this.pro && ev(rs, () => this.loseJob(pick(['会社の業績が悪化し、リストラされた。収入が途絶えた。', '勤めていた会社が倒産した。収入が途絶えた。'])))) return;
+      }
+      if (a >= 30 && ev(0.002 * (a / 10) ** 1.6, () => { const c = Math.round((30 + R() * 70) * e); this.cash -= c; this.happy -= 8; this.add('fate', `病気で入院した。医療費や生活費で約${c}万円がかかった。`); if (this.stage === 'work' && this.income > 0 && R() < 0.25) this.loseJob('体調を崩し、仕事を辞めることになった。'); })) return;
+      if (this.car && ev(0.008, () => { const c = Math.round((20 + R() * 40) * e); this.cash -= c; this.happy -= 4; this.add('fate', `車で事故を起こした。修理と保険で約${c}万円。`); })) return;
+      if (this.house && ev(0.03, () => { const c = Math.round((40 + R() * 120) * e); this.cash -= c; this.add('money', `家の${pick(['屋根', '水まわり', '外壁', '給湯器'])}が傷み、修理に約${c}万円かかった。`); })) return;
+      if (a >= 22 && this.cash > 100 * e && ev(0.05, () => { const c = Math.round((15 + R() * 25) * e); this.cash -= c; this.happy += 6; this.add('joy', `${this.married ? '家族で' : '友達と'}${pick(['沖縄', '北海道', '京都', '九州', y >= 1990 ? '台湾' : '伊勢'])}へ旅行に行った。約${c}万円。`); })) return;
+      if (a >= 20 && ev(0.002, () => { const c = Math.round(100 * e); this.cash += c; this.happy += 5; this.add('joy', `宝くじで${c}万円が当たった。`); })) return;
+    }
+    get jobLabel() {
+      if (this.stage === 'work' && this.age < this.joblessUntil) return '仕事を探している';
+      if (this.stage === 'work' && this.age < this.homeUntil) return this.gradUntil && this.age < this.gradUntil ? '大学院生' : '子育てに専念';
+      if (this.stage === 'work') return `${this.industry}・${this.selfEmp ? '自営・経営' : this.regular ? '正社員' : 'パート・非正規'}${this.remotePref && this.loc === 'tottori' ? `（${this.remotePref}の会社にリモート勤務）` : ''}`;
+      if (this.stage === 'retired') return '引退';
+      if (this.schoolName) return this.schoolName + 'の学生';
+      if (this.hs && this.age < 18) return this.hs + 'の生徒';
+      if (this.jhs && this.age >= 12 && this.age < 15) return this.jhs + 'の生徒';
+      if (this.age >= 6 && this.age < 15) return this.age < 12 ? '小学生' : '中学生';
+      return '';
+    }
+
+    moveHome(text) {
+      if (this.house === 'out') this.sellHouse();
+      this.loc = 'tottori';
+      this.place = R() < 0.55 ? this.muni : (this.region === '西部' ? '米子市' : this.region === '中部' ? '倉吉市' : '鳥取市');
+      this.returned++; this.marks[this.age] = 'home'; this.bump(12);
+      if (this.stage === 'work') this.startJob();
+      this.add('move', text.replace('{place}', this.place));
+    }
+
+    // 1年進める。決断待ちなら何もしない
+    step() {
+      if (!this.alive || this.pending) return;
+      this.years[this.age] = this.loc;
+      // 生死
+      if (this.age === 0 ? this.infantDeath : R() < qx(this.sex, this.age, this.year)) { this.die(); return; }
+      this.age++;
+      const a = this.age;
+      if (this.history()) return;
+      this.trend();
+      this.parentYear();
+      if (!this.alive) return;
+      this.finance();
+      if (a >= 13) this.lifeEvents();
+      const e0y = interp(WAGE_ERA, this.year);
+      if (this.stage === 'work' && this.income > 0 && this.once('money1')) { this.ask('money1'); return; }
+      if (this.lastRet !== null && this.lastRet <= -0.25 && this.inv > 50 * e0y && a - this.lastCrash > 3) { this.lastCrash = a; this.ask('crash'); return; }
+      if (this.year >= 2024 && a >= 20 && a <= 60 && this.invShare < 0.3 && this.stage === 'work' && R() < 0.25 && this.once('nisa')) { this.ask('nisa'); return; }
+      if (a >= 30 && a <= 72 && this.cash > 200 * e0y && R() < 0.012 && this.once('scam')) { this.ask('scam'); return; }
+      if (this.cash < -100 * e0y && a - this.lastBroke > 8) { this.lastBroke = a; this.ask('broke'); return; }
+      if (this.happy < 30 && this.stage === 'work' && this.income > 0 && a - this.lastQuit > 8) { this.lastQuit = a; this.ask('quit'); return; }
+      if (a === 30) this.locAt30 = this.loc;
+      // 学校・進路
+      if (a === 5) this.add('life', `近所の${this.friend.name}と、毎日のように遊んだ。`);
+      if (a === 7 && this.year >= 1965 && this.once('narai')) { this.ask('narai'); return; }
+      if (a === 10 && this.once('dream')) { this.ask('dream'); return; }
+      if (a === 13 && this.once('bukatsu')) { this.ask('bukatsu'); return; }
+      if (a === 14 && this.year >= 1970 && this.once('juku')) { this.ask('juku'); return; }
+      if (a === 17 && this.stage === 'teen' && this.year >= 1990 && this.once('opencamp')) { this.ask('opencamp'); return; }
+      if (a === 18) this.add('life', `幼なじみの${this.friend.name}は、${{ out_univ: '県外の大学へ進学した', in_univ: '県内の大学に進んだ', in_job: '地元で就職した', out_job: '県外で就職した' }[this.friend.path]}。`);
+      if (a === 6) {
+        this.jhsPick = pickJHS(this.muni, this.region, this.year + 6);
+        this.add('life', this.jhsPick.gimu ? `${this.jhsPick.name}（${this.muni}の義務教育学校）に入学した。小学校と中学校の9年間をここで過ごす。` : '小学校に入学した。');
+      }
+      if (a === 12) {
+        const j = this.jhsPick || pickJHS(this.muni, this.region, this.year);
+        const label = j.generic ? j.name : j.priv ? j.name : (j.gimu ? j.name : `${this.muni}立${j.name}`);
+        this.jhs = j.generic ? j.name : j.priv || j.gimu ? j.name : `${j.name}（${this.muni}）`;
+        this.add('life', j.gimu ? `${j.name}の7年生になった。` : j.priv ? `受験して${label}に入学した。` : `${label}に入学した。`);
+      }
+      if (a === 15) {
+        if (R() < interp(HS_RATE, this.year)) { this.ask('hs15'); return; }
+        else if (this.year >= 1952 && this.year <= 1975 && R() < 0.5) { const d = this.year < 1970 ? pick(['大阪府', '兵庫県', '京都府', '愛知県']) : this.outDest(false); this.stage = 'work'; this.startJob(pick(['製造業', '卸売業，小売業'])); this.moveOut(d, `中学を卒業し、集団就職の列車で${d}の${this.industry === '製造業' ? '工場' : '商店'}へ働きに出た。`); }
+        else { this.add('life', this.year < 1960 ? '中学を出て、家の田畑を手伝いながら働き始めた。' : '中学を出て、地元で働き始めた。'); this.stage = 'work'; this.job = '県内'; this.startJob(this.year < 1960 && R() < 0.6 ? '農業，林業' : undefined); }
+      }
+      if (false) {
+        if (true) {
+          this.hs = pickW(HS[this.region]);
+          if (this.hs === '米子工業高等専門学校') {
+            this.add('life', this.region === '西部' ? '米子工業高等専門学校（米子高専）に入学した。' : '米子工業高等専門学校（米子高専）に入学し、寮生活を始めた。');
+            this.edu = '高専'; this.stage = 'kosen'; this.school = 'in'; this.schoolEnd = 20; this.schoolName = '米子高専';
+          } else { this.add('life', `${this.hs}に進学した。`); this.edu = '高校'; this.stage = 'teen'; }
+        }
+        else { this.add('life', '中学を出て、地元で働き始めた。'); this.stage = 'work'; this.job = '県内'; this.startJob(); }
+      }
+      if (a === 18 && this.stage === 'teen' && this.dream === 'pro' && (this.narai === 'sport' || this.bukatsu === 'sport') && this.once('pro')) { this.ask('pro'); return; }
+      if (a === 18 && this.stage === 'teen') { this.ask('shinro'); return; }
+      if (this.schoolEnd === a) {
+        if (this.school === 'out') { this.ask('uturn'); return; }
+        if (this.school === 'in') { this.ask('stayjob'); return; }
+      }
+      if (a === 20 && this.loc === 'out' && this.once('seijin')) { this.ask('seijin'); return; }
+      if (a === 21 && this.school === 'out' && this.schoolEnd >= 22 && this.year >= 1997 && this.once('intern')) { this.ask('intern'); return; }
+      if (a >= 19 && a <= 25 && this.year >= 1965 && this.loc === 'tottori' && this.stage === 'work' && this.once('car')) { this.ask('car'); return; }
+      if (a === 30 && this.once('reunion')) { this.ask('reunion'); return; }
+      if (a === 34 && this.stage === 'work' && this.once('skill')) { this.ask('skill'); return; }
+      if (this.firstKidAge !== null && a === this.firstKidAge + 18 && this.once('childout')) { this.ask('childout'); return; }
+      if (this.childPath && this.firstKidAge !== null && a === this.firstKidAge + 23) this.childNews();
+      if (a === 50) this.friendNews();
+      if (a === 66 && this.loc === 'out' && this.stage === 'retired' && this.once('oldhome')) { this.ask('oldhome'); return; }
+      if (this.hyogakiPending) { this.hyogakiPending = false; this.ask('hyogaki'); return; }
+      if (this.retry && a === this.retry) { this.retry = null; if (R() < 0.35) { this.regular = true; this.add('life', '何度目かの挑戦で、正社員の内定をもらった。'); } else this.add('fate', '今年も正社員にはなれなかった。'); }
+      // 働き盛りの移動
+      if (this.stage === 'work') this.migrate();
+      if (a === 27 && this.stage === 'work' && !this.selfEmp && this.once('job27')) { this.ask('job27'); return; }
+      if (this.startupAge && a === this.startupAge + 3) this.startupResult();
+      if (this.pro && this.proEnd === a) { this.wageMul = 1; this.startJob(); this.add('life', `現役を引退した。セカンドキャリアとして、${this.industry}の仕事に就いた。`); }
+      if (this.stage === 'work' && !this.selfEmp && a >= 36 && a <= 50 && !this.asked.startup && R() < 0.07) { this.asked.startup = true; this.ask('startup'); return; }
+      if (this.married && !this.house && a >= 30 && a <= 45 && R() < 0.22 && this.once('house')) { this.ask('house'); return; }
+      if (a === 40 && this.loc === 'tottori' && this.once('community')) { this.ask('community'); return; }
+      if (this.stage === 'work' && !this.selfEmp && a >= 24 && a <= 40) {
+        if (this.loc === 'tottori' && !this.asked.offer && R() < 0.035) { this.asked.offer = true; this.offerPref = destPref(false); this.ask('offer'); return; }
+        if (this.loc === 'tottori' && a <= 35 && !this.asked.friends && R() < 0.05) { this.asked.friends = true; this.ask('friends'); return; }
+        if (this.loc === 'tottori' && a >= 28 && this.regular && !this.asked.transfer && R() < 0.03) { this.asked.transfer = true; this.offerPref = destPref(false); this.ask('transfer'); return; }
+        if (this.loc === 'out' && a >= 26 && !this.asked.callhome && R() < 0.045) { this.asked.callhome = true; this.ask('callhome'); return; }
+      }
+      if (this.loc === 'out' && a >= 28 && a <= 45 && (this.parents.father.alive || this.parents.mother.alive) && !this.asked.parentcall && R() < 0.04) { this.asked.parentcall = true; this.ask('parentcall'); return; }
+      if (a === 60 && this.stage === 'work' && this.once('retire')) { this.ask('retire'); return; }
+      if (a === 78 && this.year >= 1998 && this.loc === 'tottori' && this.once('license')) { this.ask('license'); return; }
+      if (this.loc === 'out' && a >= 30 && !this.parents.father.alive && !this.parents.mother.alive && this.once('akiya')) { this.ask('akiya'); return; }
+      if (a === 32 && this.loc === 'out' && this.stage === 'work') { this.ask('mid'); return; }
+      this.family();
+      if (this.loc === 'out' && !this.careAsked && a >= 40) {
+        const p = this.parents;
+        if ((p.father.alive && p.father.age >= 80) || (p.mother.alive && p.mother.age >= 80)) {
+          if (R() < 0.12) { this.careAsked = true; this.ask('care'); return; }
+        }
+      }
+      if (a === this.retireAge && this.stage === 'work') {
+        this.stage = 'retired'; this.income = 0;
+        { const e = interp(WAGE_ERA, this.year);
+          this.pensionAmt = Math.round((this.regYears >= 10 ? PENSION_KOKUMIN + (PENSION_KOSEI - PENSION_KOKUMIN) * Math.min(1, this.regYears / 38) : PENSION_KOKUMIN) * e);
+          if (this.regular && this.regYears >= 20 && !this.selfEmp) { const ls = Math.round(Math.min(1500, 800 + 30 * (this.regYears - 20)) * e); this.cash += ls; this.add('money', `退職金${ls}万円を受け取った。`); }
+          this.add('money', `年金は年に約${this.pensionAmt}万円（月に約${Math.round(this.pensionAmt / 12 * 10) / 10}万円）。ここからは、貯えを取り崩しながら暮らしていく。`); }
+        this.add('life', `${a}歳。仕事を退いた。働いて得た収入は合計${fmtMoney(this.lifetime)}。`);
+        if (this.loc === 'out' && R() < 0.08 * (0.5 + this.tie / 100)) this.moveHome('定年を機に、鳥取（{place}）へ戻った。');
+      }
+      this.flavor();
+    }
+
+    migrate() {
+      const a = this.age;
+      if (this.loc === 'out') {
+        const h = (a < 30 ? 0.016 : a < 40 ? 0.012 : a < 50 ? 0.008 : a < 65 ? 0.009 : 0.003) * (0.5 + this.tie / 100) * (this.house === 'out' ? 0.4 : 1);
+        if (R() < h) this.moveHome(a < 50 ? '転職を機に、鳥取（{place}）へ戻った。' : '鳥取（{place}）の実家に戻ることにした。');
+      } else {
+        const h = (a < 30 ? 0.008 : a < 45 ? 0.004 : 0.0015) * (1.5 - this.tie / 100) * (this.house === 'tottori' ? 0.3 : 1) * (this.selfEmp ? 0.3 : 1);
+        if (R() < h) { const d = destPref(false); this.moveOut(d, `転勤で${d}へ引っ越した。`); }
+      }
+    }
+
+    family() {
+      const a = this.age;
+      if (!this.married && !this.divorced && R() < marHazardBy(this.sex, a, this.birthYear)) {
+        if (this.auto) this.marry();
+        else { this.ask('marry'); return; }
+      } else if (this.married && a - this.marAge < 25 && R() < 0.007) {
+        this.married = false; this.divorced = true; this.happy -= 15; this.cash *= 0.5; this.inv *= 0.5; this.add('life', '離婚した。貯金や財産は半分ずつに分けた。');
+      }
+      const fertile = this.sex === 'f' ? a <= 43 : a <= 47;
+      if (!this.auto && this.married && this.kids === 0 && fertile && a - this.marAge === 1 && this.once('kids0')) { this.ask('kids0'); return; }
+      if (this.married && this.kids < this.planKids && fertile && a - this.marAge >= 1 && R() < 0.38) {
+        this.kids++; this.add('life', `第${this.kids}子が生まれた。`);
+        if (this.kids === 1) this.firstKidAge = a;
+        this.kidBirths.push(a); this.happy += 10;
+        if (this.kids === 1 && this.stage === 'work' && this.regular && !this.selfEmp) { this.ask('childwork'); return; }
+        if (!this.auto && fertile && this.kids < 7) { this.ask('kidmore'); return; }
+      }
+      if (!this.grand && this.kids > 0 && a >= 55 && a <= 72 && R() < 0.06) {
+        this.grand = true; this.add('life', '初孫が生まれた。');
+      }
+    }
+
+    marry() {
+      this.married = true; this.marAge = this.age; this.happy += 12;
+      this.planKids = pickW(kidsDist(this.birthYear));
+      this.add('life', this.loc === 'tottori' ? '結婚した。式は地元の神社で挙げた。' : `${this.place}で出会った人と結婚した。`);
+    }
+    friendNews() {
+      const f = this.friend;
+      if (f.back === null) f.back = (f.path === 'out_univ' || f.path === 'out_job') ? (R() < 0.45 ? 'back' : 'out') : (R() < 0.85 ? 'stay' : 'out');
+      const t = f.back === 'back' ? `幼なじみの${f.name}が、鳥取に戻ってきていると聞いた。` : f.back === 'stay' ? (this.loc === 'tottori' ? `幼なじみの${f.name}とは、いまも地元で時々顔を合わせる。` : `幼なじみの${f.name}は、ずっと地元で暮らしている。帰省すると顔を出してくれる。`) : `幼なじみの${f.name}は、県外で暮らし続けているらしい。`;
+      this.add('life', t);
+    }
+    childNews() {
+      const back = this.childPath === 'out' ? R() < 0.3 : R() < 0.75;
+      this.childNow = back ? 'tottori' : 'out';
+      this.add('life', this.childPath === 'out' ? (back ? '県外の大学を出た子どもが、鳥取で就職すると帰ってきた。' : `子どもは${destPref(false)}で就職した。電話は週に一度。`) : (back ? '子どもは鳥取で就職した。' : `県内に残ると思っていた子どもが、${destPref(false)}で就職を決めた。`));
+    }
+    startupResult() {
+      if (R() < 0.55) { this.wageMul *= 1.35; this.add('life', '店（会社）が軌道に乗った。常連さんも増えてきた。'); }
+      else { this.selfEmp = false; this.wageMul *= 0.85; this.regular = R() < 0.5; this.add('fate', '思うように売り上げが伸びず、店をたたんだ。また勤めに出ることにした。'); }
+    }
+
+    trend() {
+      if (R() > 0.4) return;
+      const y = this.year, a = this.age;
+      const cand = TRENDS.filter(t => y >= t[0] && y <= t[1] && a >= t[2] && a <= t[3] && !this.used.has(t[4]) && (!t[5] || this.loc === t[5]));
+      if (!cand.length) return;
+      const t = pick(cand); this.used.add(t[4]); this.add(/未来の想像/.test(t[4]) ? 'future' : 'trend', t[4]);
+    }
+    history() {
+      const y = this.year, a = this.age, inT = this.loc === 'tottori';
+      const say = t => this.add('era', t);
+      if (y === 1941 && a >= 5) say('太平洋戦争が始まった。');
+      if (this.sex === 'm' && y >= 1937 && y <= 1945 && a >= 19 && a <= 42) {
+        if (!this.drafted) { this.drafted = true; say('召集令状が届き、兵隊として戦地へ向かった。'); }
+        if (R() < (y >= 1941 ? 0.045 : 0.01)) { this.cause = '戦争'; this.alive = false; this.deathPlace = '戦地'; this.years[a] = 'out'; this.add('death', `${a}歳、戦地で亡くなった。`); return true; }
+      }
+      if (y === 1943 && inT) {
+        say('9月10日、鳥取地震が起きた。県内で1,210人が亡くなり、7千棟以上の家が全壊した。');
+        if (this.region === '東部') {
+          if (R() < 0.006) { this.cause = '鳥取地震'; this.alive = false; this.deathPlace = this.place; this.years[a] = 'tottori'; this.add('death', `${a}歳、鳥取地震で亡くなった。`); return true; }
+          if (R() < 0.3) this.add('fate', '家が倒れた。しばらく親戚の家に身を寄せた。');
+        }
+      }
+      if (y === 1945 && a >= 3) say(this.drafted ? '戦争が終わった。生きて鳥取に帰ってきた。' : '戦争が終わった。');
+      if (y === 1952 && inT) {
+        if (this.place === '鳥取市') { say('4月17日、鳥取大火。強い風で火が広がり、市街地の多くが焼けた。'); if (R() < 0.35) this.add('fate', '家も焼けた。焼け跡から、使えるものを探して歩いた。'); }
+        else if (a >= 5) say('鳥取市で大火があったと聞いた。');
+      }
+      if (y === 1964 && a >= 5) say('東京オリンピックをテレビで見た。');
+      if (y === 1973 && a >= 8) say('オイルショック。店からトイレットペーパーが消えた。');
+      if (y === 1987 && inT) say('10月、台風19号の豪雨で、県内に大きな被害が出た。');
+      if (y === 1989 && a >= 5) say('元号が平成に変わった。');
+      if (y === 1995 && a >= 5) say(this.place === '兵庫県' ? '阪神・淡路大震災に遭った。揺れで目が覚め、外に出ると町が崩れていた。' : '阪神・淡路大震災のニュースに言葉を失った。');
+      if (y === 2000 && inT && this.region === '西部' && this.house) { const c = Math.round(80 + R() * 150); this.cash -= c; this.add('money', `地震で傷んだ家の修理に約${c}万円かかった。`); }
+      if (y === 2016 && inT && this.region === '中部' && this.house) { const c = Math.round(60 + R() * 120); this.cash -= c; this.add('money', `地震で傷んだ屋根の修理に約${c}万円かかった。`); }
+      if (y === 2000 && inT) say(this.region === '西部' ? '10月6日、鳥取県西部地震。最大震度6強。家の壁にひびが入った。' : '10月6日、鳥取県西部地震。こちらも大きく揺れた。');
+      if (y === 2011 && a >= 5) say('東日本大震災。テレビの映像から目が離せなかった。');
+      if (y === 2015 && inT && a >= 10 && a <= 50) say('鳥取にスターバックスができた。開店の日は行列ができた。');
+      if (y === 2016 && inT) say(this.region === '中部' ? '10月21日、鳥取県中部地震。最大震度6弱。町のあちこちで屋根にブルーシートがかかった。' : '10月21日、鳥取県中部地震。こちらも揺れた。');
+      if (y === 2017 && inT && a >= 5) say('2月の大雪で、道路に車が何台も立ち往生した。');
+      if (y === 2019 && a >= 5) say('元号が令和に変わった。');
+      if (y === 2020 && a >= 3) say(a >= 6 && a <= 18 ? '新型コロナウイルスが広がり、学校が休みになった。' : '新型コロナウイルスが広がり、帰省を控えた。');
+      return false;
+    }
+
+    parentYear() {
+      for (const [key, p] of Object.entries(this.parents)) {
+        if (!p.alive) continue;
+        if (R() < qx(key === 'father' ? 'm' : 'f', p.age, this.year)) {
+          p.alive = false;
+          if (this.age >= 25) { this.cash -= Math.round(50 * interp(WAGE_ERA, this.year)); this.happy -= 10; }
+          const who = key === 'father' ? '父' : '母';
+          if (this.age > 3) this.add('loss', this.loc === 'out' && this.age >= 18
+            ? `${who}が亡くなった（享年${p.age}）。知らせを受けて鳥取へ帰った。`
+            : `${who}が亡くなった（享年${p.age}）。`);
+        } else p.age++;
+      }
+    }
+
+    localMuni() { return this.loc === 'tottori' ? (LOCAL[this.place] ? this.place : this.muni) : this.muni; }
+    spotPick() {
+      const m = this.localMuni(); const r = R();
+      const ok = x => !SINCE[x] || this.year >= SINCE[x];
+      const pk = arr => { const f = arr.filter(ok); return f.length ? pick(f) : null; };
+      if (r < 0.6) return pk(LOCAL[m].spots);
+      if (r < 0.85) { const same = MUNIS.filter(x => x[1] === this.region).map(x => x[0]); return pk(LOCAL[pick(same)].spots); }
+      return pk(ICONS);
+    }
+    local() {
+      const a = this.age, m = this.localMuni(), L = LOCAL[m];
+      if (a < 2 || a > 95) return;
+      // 祭り：鳥取にいる年は時々、県外にいる年はまれに帰省して
+      const fests = L.fest.filter(f => !SINCE[f[0]] || this.year >= SINCE[f[0]]);
+      if (fests.length && R() < (this.loc === 'tottori' ? 0.16 : 0.03)) {
+        const f = pick(fests);
+        this.festN = this.festN || {}; if (this.loc === 'tottori') this.bump(1);
+        const n = this.festN[f[0]] = (this.festN[f[0]] || 0) + 1;
+        if (n > 3) return;
+        this.add('local', this.loc !== 'tottori' ? `帰省して、${f[0]}を久しぶりに見た。` : n === 1 ? f[1] : n === 2 ? `今年も${f[0]}に出かけた。` : `${f[0]}に行くのが、すっかり毎年のことになった。`);
+        return;
+      }
+      if (R() < (this.loc === 'out' ? 0.05 : 0.12)) {
+        this.spotSeen = this.spotSeen || new Set();
+        let sp = this.spotPick();
+        for (let i = 0; i < 4 && (!sp || this.spotSeen.has(sp)); i++) sp = this.spotPick();
+        if (!sp || this.spotSeen.has(sp)) return;
+        this.spotSeen.add(sp); let t;
+        if (a < 12) t = pick([`遠足で${sp}へ行った。`, `家族で${sp}に出かけた。`]);
+        else if (a < 18) t = pick([`友達と${sp}へ行った。`, `部活の仲間と${sp}に寄った。`]);
+        else if (this.loc === 'out') t = pick([`帰省ついでに${sp}に寄った。`, `県外の友達に${sp}の写真を見せたら驚かれた。`]);
+        else if (a < 70) t = pick([`休みの日に${sp}へドライブした。`, `県外から来た友達を${sp}に案内した。`, this.kids ? `子どもを連れて${sp}に出かけた。` : `ひとりで${sp}に出かけた。`]);
+        else t = this.grand ? `孫を${sp}に連れて行った。` : `久しぶりに${sp}を訪ねた。`;
+        this.add('local', t);
+      }
+    }
+
+    flavor() {
+      this.local();
+      if (R() > 0.25) return;
+      const a = this.age, F = FLAVOR;
+      let pool;
+      if (a < 13) pool = (this.loc === 'tottori') ? F.kid[this.region].concat(F.kid.all) : null;
+      else if (a < 18) pool = F.teen;
+      else if (a < 70) pool = this.loc === 'tottori' ? F.tottori_adult : F.out_adult;
+      else pool = this.loc === 'tottori' ? F.old_tottori : F.old_out;
+      if (!pool) return;
+      const fresh = pool.filter(t => !this.used.has(t));
+      if (!fresh.length) return;
+      const t = pick(fresh); this.used.add(t); this.add('flavor', t);
+    }
+
+    die() {
+      if (this.dream && !this.dreamDone && DREAMS[this.dream].check(this)) { this.dreamDone = true; }
+      this.alive = false; this.cause = causeOfDeath(this.age, this.year); this.deathPlace = this.place;
+      this.years[this.age] = this.loc;
+      const where = this.loc === 'tottori' ? `鳥取県${this.place}` : this.place;
+      this.add('death', this.age === 0 ? `1歳の誕生日を迎えることなく亡くなった。${this.cause}だった。` : `${this.age}歳、${where}で亡くなった。${this.cause}だった。`);
+    }
+
+    // ---- 決断 ----
+    ask(id) {
+      const d = DECISIONS[id];
+      this.pending = { id, title: typeof d.title === 'function' ? d.title(this) : d.title, stat: typeof d.stat === 'function' ? d.stat(this) : d.stat, options: d.options(this) };
+      if (this.auto) this.choose(d.auto(this));
+    }
+    choose(key) {
+      const id = this.pending.id;
+      const opt = this.pending.options.find(o => o.key === key);
+      if (!this.auto && opt) this.choices.push({ age: this.age, title: this.pending.title, label: opt.label });
+      this.pending = null;
+      this.decisions[id] = key;
+      DECISIONS[id].resolve(this, key, this.auto);
+    }
+
+    autoChoose() {
+      const was = this.auto; this.auto = true;
+      this.choose(DECISIONS[this.pending.id].auto(this));
+      this.auto = was;
+    }
+
+    summary() {
+      const yrs = this.years.slice(0, this.age + 1);
+      const inT = yrs.filter(x => x === 'tottori').length;
+      return {
+        name: this.name, sex: this.sex, muni: this.muni, age: this.age, cause: this.cause,
+        inT, out: yrs.length - inT, everLeft: this.everLeft, returned: this.returned,
+        edu: this.edu, married: this.married || this.divorced, kids: this.kids,
+        hospital: this.hospital, diedIn: this.loc, deathPlace: this.deathPlace, locAt30: this.locAt30,
+        choices: this.choices, friend: this.friend, childNow: this.childNow, fin: this.fin, net: this.net, birthYear: this.birthYear, gen: genOf(this.birthYear).id, regularEnd: this.regular, remote: !!this.remotePref, dream: this.dream, dreamDone: this.dreamDone, town: this.town,
+        jhs: this.jhs, hs: this.hs, school: this.schoolName, industry: this.industry, lifetime: this.lifetime, peak: this.peak
+      };
+    }
+  }
+
+  function remoteOpt(L) {
+    if (L.year < 2020) return [];
+    const p = interp(REMOTE, L.year);
+    return [{ key: 'remote', label: '鳥取に住んだまま、県外の会社にリモートで勤める', pro: `都市の会社の給料で、鳥取で暮らせる（目安：約${Math.round(L.est('東京都') * 0.95 / 10) * 10}万円）`, con: `募集は限られ、決まるのはおよそ${Math.round(p * 100)}%。同僚と会うのは画面越し${L.year > 2026 ? '（未来の割合は想像）' : ''}` }];
+  }
+  function tryRemote(L, auto) {
+    const p = interp(REMOTE, L.year);
+    if (auto || R() < p) {
+      L.stage = 'work'; L.startJob(pick(['情報通信業', '学術研究，専門・技術サービス業', '金融業，保険業', '卸売業，小売業']));
+      L.remotePref = '東京都';
+      if (L.loc === 'out') L.moveHome('鳥取（{place}）に住みながら、東京の会社にリモートで勤めることにした。');
+      else L.add('life', '鳥取に住んだまま、東京の会社にリモートで勤めることにした。');
+      L.remotePref = '東京都';
+      return true;
+    }
+    L.add('fate', 'リモートで働ける仕事は見つからなかった。');
+    return false;
+  }
+
+  const DECISIONS = {
+    money1: {
+      title: L => `初めての給料。年収は約${L.income}万円。お金をどうする？`,
+      stat: '鳥取市の勤労者世帯は、手取りのおよそ3分の2を毎月の生活に使っています（2025年の家計調査）。',
+      options: L => [
+        { key: 'save', label: '毎月決まった額を貯金する', pro: 'いざというときに使えるお金が貯まる', con: '銀行に置いておくだけでは、ほとんど増えない' },
+        { key: 'invest', label: L.year >= 2000 ? '投資信託などで、コツコツ運用する' : '株を買って、運用してみる', pro: '長い目で見ると、貯金より増えやすい', con: '暴落の年には大きく減る。すぐには引き出しにくい' },
+        { key: 'enjoy', label: '稼いだぶん、好きなことに使う', pro: '若いうちにしかできない経験ができる', con: 'いざというときの蓄えがない' }
+      ],
+      auto: L => pickW([['save', 50], ['invest', L.year >= 2014 ? 30 : 10], ['enjoy', 30]]),
+      resolve(L, key) {
+        if (key === 'save') { L.invShare = 0; L.spend = 0.95; L.add('money', '給料日に、決まった額を貯金にまわすことにした。'); }
+        else if (key === 'invest') { L.invShare = 0.5; L.add('money', '余ったお金の半分を、運用にまわすことにした。'); }
+        else { L.invShare = 0; L.spend = 1.15; L.happy += 5; L.add('money', '稼いだお金は、趣味や遊びに使うことにした。'); }
+      }
+    },
+    nisa: {
+      title: '新しいNISAが始まった。投資を始める？',
+      stat: '2024年に新しいNISAが始まり、投資で得た利益に税金がかからない枠が大きく広がりました。',
+      options: () => [
+        { key: 'start', label: '毎月つみたてで投資を始める', pro: '長く続けるほど、増える見込みが大きい', con: '値下がりする年もある。生活費まで回すと危ない' },
+        { key: 'no', label: 'よくわからないので、貯金のままにする', pro: '元本は減らない', con: 'お金はほとんど増えない' }
+      ],
+      auto: () => (R() < 0.4 ? 'start' : 'no'),
+      resolve(L, key) { if (key === 'start') { L.invShare = 0.5; L.add('money', 'NISAでつみたて投資を始めた。'); } else L.add('money', '投資はせず、貯金を続けることにした。'); }
+    },
+    crash: {
+      title: L => `${L.year}年、株価が大きく下がった。運用しているお金が${Math.round(-L.lastRet * 100)}%減った。`,
+      stat: L => `${{ 1990: 'バブル崩壊', 1992: 'バブル崩壊後の不況', 2000: 'ITバブルの崩壊', 2001: 'ITバブル崩壊後の下落', 2008: 'リーマン・ショック' }[L.year] || '大きな下落'}の年。過去の暴落でも、持ち続けた人は年月をかけて取り戻したことが多い一方、回復まで長くかかった時期もあります。`,
+      options: L => [
+        { key: 'sell', label: '怖いので、全部売って現金にする', pro: 'これ以上は減らない', con: `損失（約${Math.round(L.inv / (1 + L.lastRet) * -L.lastRet)}万円）が確定する。回復しても戻らない` },
+        { key: 'hold', label: '何もせず、持ち続ける', pro: '回復すれば取り戻せる', con: 'さらに下がるかもしれない' },
+        { key: 'buy', label: '安いうちに、貯金の半分で買い増す', pro: '回復したときの増え方が大きい', con: 'さらに下がれば損が広がる。貯金が減る' }
+      ],
+      auto: () => pickW([['sell', 20], ['hold', 70], ['buy', 10]]),
+      resolve(L, key) {
+        if (key === 'sell') { L.cash += L.inv; L.inv = 0; L.invShare = 0; L.happy -= 4; L.add('money', '運用していたお金を全部売った。損は確定したが、少し気が楽になった。'); }
+        else if (key === 'hold') L.add('money', '値動きは見ないことにして、持ち続けた。');
+        else { const m = Math.max(0, L.cash * 0.5); L.cash -= m; L.inv += m; L.add('money', `貯金から${Math.round(m)}万円を、値下がりした株に回した。`); }
+      }
+    },
+    scam: {
+      title: '知り合いから「絶対にもうかる」投資の話を持ちかけられた。',
+      stat: '「元本保証で高利回り」などとうたう投資詐欺の相談は、全国の消費生活センターに毎年数多く寄せられています。',
+      options: L => [
+        { key: 'join', label: '信じて、200万円をあずける', pro: '話が本当なら、お金が倍になる', con: '本当である保証はどこにもない' },
+        { key: 'no', label: 'うますぎる話なので断る', pro: 'お金は守れる', con: '知り合いとの関係が気まずくなる' }
+      ],
+      auto: () => (R() < 0.08 ? 'join' : 'no'),
+      resolve(L, key) {
+        const m = Math.round(200 * interp(WAGE_ERA, L.year));
+        if (key === 'join') { L.cash -= m; L.happy -= 15; L.add('fate', `${m}万円をあずけたが、半年後に連絡がとれなくなった。お金は戻ってこなかった。`); }
+        else L.add('life', '投資の話は断った。数か月後、その話が詐欺だったと知った。');
+      }
+    },
+    broke: {
+      title: '貯金が底をつき、借金をして暮らしている。',
+      stat: null,
+      options: L => [
+        { key: 'save', label: '暮らしを切りつめる', pro: '出ていくお金が減る', con: '楽しみが減り、気持ちも沈みがち' },
+        { key: 'side', label: L.stage === 'retired' ? 'パートで働きに出る' : '副業や残業を増やす', pro: '収入が増える', con: '体力的にきつい' },
+        { key: 'family', label: '家族や親戚に相談する', pro: 'まとまったお金を助けてもらえる', con: '頭を下げるのはつらい' }
+      ].concat(L.house ? [{ key: 'house', label: '家を売る', pro: 'まとまったお金になる', con: '住み慣れた家を離れる' }] : []),
+      auto: () => 'save',
+      resolve(L, key) {
+        const e = interp(WAGE_ERA, L.year);
+        if (key === 'save') { L.spend = Math.max(0.75, L.spend * 0.85); L.happy -= 5; L.add('money', '暮らしを切りつめることにした。'); }
+        else if (key === 'side') { L.sideUntil = L.age + 5; L.happy -= 3; L.add('money', L.stage === 'retired' ? '近くのお店でパートを始めた。' : '休日に副業を始めた。'); }
+        else if (key === 'family') { L.cash += 100 * e; L.happy -= 3; L.add('money', `家族に相談し、${Math.round(100 * e)}万円を助けてもらった。`); }
+        else L.sellHouse();
+      }
+    },
+    quit: {
+      title: 'もう限界かもしれない。仕事がつらい。',
+      stat: null,
+      options: () => [
+        { key: 'rest', label: '仕事を辞めて、しばらく休む', pro: '心と体を休められる', con: '収入がなくなり、貯金が減っていく' },
+        { key: 'change', label: '転職活動をして、職場を変える', pro: '環境を変えられる', con: '給料が下がることもある' },
+        { key: 'keep', label: '歯を食いしばって続ける', pro: '収入は途切れない', con: 'つらさは続く' }
+      ],
+      auto: () => pickW([['rest', 15], ['change', 25], ['keep', 60]]),
+      resolve(L, key) {
+        if (key === 'rest') { L.joblessUntil = L.age + 1; L.jobless = true; L.happy += 15; L.add('life', '仕事を辞めた。しばらくは何もせず、ゆっくり休んだ。'); }
+        else if (key === 'change') { L.startJob(); L.wageMul *= 0.95; L.happy += 10; L.add('life', `転職して、${L.industry}の仕事に移った。`); }
+        else { L.happy -= 3; L.add('life', '辞めずに続けることにした。'); }
+      }
+    },
+    hyogaki: {
+      title: L => `${L.year}年。正社員の内定が出ないまま、卒業を迎えた。`,
+      stat: L => { const r = jobRatio(L.year); return `${r ? `この年の大卒求人倍率は${r}倍。` : ''}1990年代半ばから2000年代前半の「就職氷河期」には、正社員になれず非正規で働き始める若者が大勢いました。`; },
+      options: L => [
+        { key: 'keep', label: '派遣やアルバイトで働きながら、正社員を目指す', pro: 'いまの土地で就職活動を続けられる', con: '非正規の期間が長引くと、正社員への道はさらに狭くなる' },
+        { key: 'home', label: '鳥取に帰って、地元で仕事を探す', pro: '実家で暮らせば生活費をおさえられる。地元のつてもある', con: '鳥取も求人は少ない' },
+        { key: 'grad', label: '大学院に進んで、景気の回復を待つ', pro: '専門性を高めて、2年後に再挑戦できる', con: '学費がかかる。2年後の景気はわからない' }
+      ],
+      auto: () => 'keep',
+      resolve(L, key) {
+        if (key === 'keep') { L.retry = L.age + 2; L.add('life', '派遣社員として働きながら、就職活動を続けた。'); }
+        else if (key === 'home') { if (L.loc === 'out') L.moveHome('鳥取（{place}）の実家に帰った。'); L.startJob(); L.add('life', L.regular ? `地元のつてで、${L.industry}の正社員の仕事が見つかった。` : `${L.industry}の仕事で、アルバイトから始めた。`); }
+        else { L.edu = '大学'; L.homeUntil = L.age + 2; L.gradUntil = L.age + 2; L.retry = L.age + 2; L.wageMul *= 1.05; L.add('life', '大学院に進んだ。'); }
+      }
+    },
+    dream: {
+      title: '10歳。将来の夢を作文に書くことになった。',
+      stat: '夢は1枚だけ選べます。叶ったかどうかは、人生の最後にわかります。',
+      options: L => {
+        const ids = Object.keys(DREAMS); const pickd = [];
+        while (pickd.length < 3) { const id = pickW(ids.map(i => [i, 4 - DREAMS[i].rare])); if (!pickd.includes(id)) pickd.push(id); }
+        return pickd.map(id => ({ key: id, label: DREAMS[id].name, pro: DREAMS[id].hint, con: ['', '叶いやすい夢', 'ふつうの夢', 'むずかしい夢'][DREAMS[id].rare] }));
+      },
+      auto: () => pickW(Object.keys(DREAMS).map(i => [i, 4 - DREAMS[i].rare])),
+      resolve(L, key) { L.dream = key; L.add('dream', `作文に書いた夢は「${DREAMS[key].name}」。`); }
+    },
+    pro: {
+      title: '18歳。プロの入団テストを受けられることになった。',
+      stat: 'プロのスポーツ選手になれるのは、競技を続けてきた人のなかでも、ほんのひと握りです。',
+      options: L => [
+        { key: 'try', label: '入団テストに挑戦する', pro: '夢に手が届くかもしれない', con: '落ちたら、進学や就職の準備は出遅れる' },
+        { key: 'no', label: '夢はあきらめて、進路を考える', pro: '堅実な道を選べる', con: 'この先ずっと「挑戦していたら」と思うかもしれない' }
+      ],
+      auto: () => 'try',
+      resolve(L, key) {
+        if (key === 'try' && R() < 0.05) {
+          L.pro = true; L.stage = 'work'; L.edu = '高校'; L.proEnd = 18 + 6 + Math.floor(R() * 8);
+          L.startJob('生活関連サービス業，娯楽業'); L.wageMul = 1.6; L.regular = true;
+          L.add('dream', L.year >= 2011 ? '入団テストに合格。ガイナーレ鳥取の選手になった。' : '入団テストに合格。プロ選手になった。');
+          L.checkDream();
+          return;
+        }
+        L.add('fate', key === 'try' ? '入団テストは不合格だった。悔しくて眠れなかった。' : 'プロの夢には区切りをつけた。');
+        L.ask('shinro');
+      }
+    },
+    narai: {
+      title: '7歳。何か習い事をする？',
+      stat: null,
+      options: L => [
+        { key: 'sport', label: 'スポーツ少年団に入る', pro: '体力がつき、地区の友達が増える', con: '土日は試合や練習でつぶれる' },
+        { key: 'culture', label: '習字やピアノを習う', pro: '集中力がつく', con: L.kakei === '苦しい' ? '月謝が家計の負担になる' : '練習が面倒な日もある' },
+        { key: 'none', label: '習い事はしない', pro: '放課後は自由に遊べる', con: '友達が習い事で忙しく、遊ぶ相手が減る' }
+      ],
+      auto: () => pickW([['sport', 40], ['culture', 35], ['none', 25]]),
+      resolve(L, key) {
+        L.narai = key;
+        if (key === 'sport') { L.bump(3); L.add('life', 'スポーツ少年団に入った。週末は地区の運動場で練習。'); }
+        else if (key === 'culture') { L.gaku = clamp(L.gaku + 0.04, 0, 1); L.add('life', '習い事を始めた。'); }
+        else L.add('life', '習い事はせず、放課後は友達と川や田んぼで遊んだ。');
+      }
+    },
+    bukatsu: {
+      title: '中学校。部活はどうする？',
+      stat: null,
+      options: () => [
+        { key: 'sport', label: '運動部に入る', pro: '仲間との結びつきが強くなる', con: '朝練と土日の練習で忙しい' },
+        { key: 'culture', label: '文化部に入る（吹奏楽・美術など）', pro: '好きなことを深められる', con: '発表会前は遅くまで残る' },
+        { key: 'none', label: '部活に入らない', pro: '勉強や家の手伝いに時間を使える', con: '学校での居場所が少し狭くなる' }
+      ],
+      auto: () => pickW([['sport', 60], ['culture', 30], ['none', 10]]),
+      resolve(L, key) {
+        L.bukatsu = key;
+        L.add('life', key === 'sport' ? '運動部に入った。県大会を目指して練習した。' : key === 'culture' ? '文化部に入った。夏のコンクールに向けて練習した。' : '部活には入らなかった。');
+        if (key !== 'none') L.bump(2); else L.gaku = clamp(L.gaku + 0.03, 0, 1);
+      }
+    },
+    juku: {
+      title: '14歳。高校受験が近づいてきた。塾に行く？',
+      stat: null,
+      options: L => [
+        { key: 'go', label: '塾に通う', pro: '成績が上がりやすく、進路の選択肢が広がる', con: L.kakei === '苦しい' ? '家計が苦しく、親に無理をさせることになる' : '部活との両立が大変' },
+        { key: 'self', label: '自分で勉強する', pro: 'お金がかからない', con: 'わからないところを聞ける人が少ない' }
+      ],
+      auto: L => (R() < (L.kakei === '苦しい' ? 0.35 : 0.6) ? 'go' : 'self'),
+      resolve(L, key) {
+        if (key === 'go') { L.gaku = clamp(L.gaku + 0.12, 0, 1); L.add('life', '塾に通い始めた。帰りは親の車で迎えに来てもらった。'); }
+        else { L.gaku = clamp(L.gaku + 0.04, 0, 1); L.add('life', '家で自分なりに勉強した。'); }
+      }
+    },
+    opencamp: {
+      title: '17歳。夏休みにオープンキャンパスがある。',
+      stat: '鳥取の高校卒業生のうち、約5割が県外へ進学します。',
+      options: () => [
+        { key: 'out', label: '県外の大学を見に行く', pro: '都会の大学の雰囲気を肌で知れる', con: '交通費がかかる。行ったら、鳥取を出たくなるかもしれない' },
+        { key: 'in', label: '県内の大学を見に行く', pro: '地元で学ぶ道を具体的に考えられる', con: '県外と比べる材料は少ないまま' },
+        { key: 'job', label: '企業の見学会に行く', pro: '高卒で働く道がはっきりする', con: '進学の準備は手薄になる' }
+      ],
+      auto: () => pickW([['out', 50], ['in', 30], ['job', 20]]),
+      resolve(L, key) {
+        L.lean = key;
+        if (key === 'out') { L.gaku = clamp(L.gaku + 0.03, 0, 1); L.add('life', '県外の大学のオープンキャンパスに行った。人の多さに驚いた。'); }
+        else if (key === 'in') L.add('life', '県内の大学のオープンキャンパスに行った。');
+        else L.add('life', '地元の企業の見学会に参加した。');
+      }
+    },
+    intern: {
+      title: '大学3年。就職活動が始まる。',
+      stat: '県外の学校に進んだ鳥取出身者のうち、卒業時に鳥取で就職するのは約35%。鳥取の企業を知る機会が少ないことも理由のひとつです。',
+      options: () => [
+        { key: 'tottori', label: '鳥取の企業のインターンシップに参加する', pro: '地元の会社を知れて、Uターン就職の道が開ける', con: '帰省の交通費がかかる。県外の就活は出遅れる' },
+        { key: 'city', label: 'いま住んでいる地域の企業を中心に回る', pro: '効率よく就活を進められる', con: '鳥取の会社のことは、よく知らないまま' }
+      ],
+      auto: () => (R() < 0.3 ? 'tottori' : 'city'),
+      resolve(L, key) {
+        if (key === 'tottori') { L.internT = true; L.bump(6); L.add('life', '夏休みに鳥取の企業のインターンシップに参加した。'); }
+        else L.add('life', `${L.place}の企業を中心に就職活動をした。`);
+      }
+    },
+    car: {
+      title: '鳥取で働き始めた。車はどうする？',
+      stat: null,
+      options: () => [
+        { key: 'kei', label: '中古の軽自動車を買う', pro: '安くて維持費も軽い', con: '大雪の日や高速道路は少し不安' },
+        { key: 'new', label: 'ローンを組んで新車を買う', pro: '休日に遠出できる。冬道も安心', con: '毎月のローンが重い' },
+        { key: 'none', label: '車は持たず、バスと自転車で暮らす', pro: 'お金がかからない', con: 'バスは1時間に1本。行ける場所が限られる' }
+      ],
+      auto: () => pickW([['kei', 60], ['new', 30], ['none', 10]]),
+      resolve(L, key) {
+        L.car = key !== 'none'; if (key === 'new') { L.cash -= 60 * interp(WAGE_ERA, L.year); }
+        L.add('life', key === 'kei' ? '初めての車は中古の軽自動車。' : key === 'new' ? '新車を買った。最初の週末は大山まで走った。' : '車は持たないことにした。');
+        if (key === 'none') L.bump(-3);
+      }
+    },
+    reunion: {
+      title: '30歳。同窓会の案内が届いた。',
+      stat: null,
+      options: L => [
+        { key: 'go', label: '同窓会に行く', pro: `幼なじみの${L.friend.name}にも会えるかもしれない`, con: L.loc === 'out' ? '帰省の日程と交通費のやりくりが必要' : '近況を比べられるのが少し気が重い' },
+        { key: 'no', label: '今回は行かない', pro: 'ゆっくり休める', con: '昔の友達との距離が少しずつ開いていく' }
+      ],
+      auto: () => (R() < 0.5 ? 'go' : 'no'),
+      resolve(L, key) {
+        const f = L.friend;
+        f.back = (f.path === 'out_univ' || f.path === 'out_job') ? (R() < 0.35 ? 'back' : 'out') : (R() < 0.85 ? 'stay' : 'out');
+        if (key === 'go') {
+          L.bump(L.loc === 'out' ? 8 : 4);
+          L.add('life', `同窓会に行った。${f.name}は${f.back === 'back' ? '県外から鳥取に戻ってきていた' : f.back === 'stay' ? 'ずっと地元で働いていた' : '県外から帰省して来ていた'}。${L.loc === 'out' && f.back !== 'out' ? '「お前も戻ってこいよ」と言われた。' : ''}`);
+        } else L.add('life', '同窓会には行かなかった。');
+      }
+    },
+    skill: {
+      title: '34歳。仕事にも慣れてきた。',
+      stat: null,
+      options: () => [
+        { key: 'study', label: '資格の勉強を始める', pro: 'うまくいけば給料や仕事の幅が広がる', con: '仕事のあとと休日の時間が勉強に消える' },
+        { key: 'side', label: '副業を始める', pro: '収入の柱がもうひとつできる', con: '体力的にきつくなる' },
+        { key: 'none', label: '家族や趣味の時間を大事にする', pro: '心に余裕ができる', con: '収入はいまのまま' }
+      ],
+      auto: () => pickW([['study', 25], ['side', 10], ['none', 65]]),
+      resolve(L, key) {
+        if (key === 'study') { if (R() < 0.6) { L.wageMul *= 1.07; L.add('life', '2年かけて資格をとった。仕事の幅が広がった。'); } else L.add('fate', '資格の試験に落ちた。仕事が忙しく、勉強は続かなかった。'); }
+        else if (key === 'side') { L.wageMul *= 1.04; L.add('life', '休日に副業を始めた。'); }
+        else { L.bump(2); L.add('life', '休みの日は、家族や趣味の時間にあてた。'); }
+      }
+    },
+    childout: {
+      title: '子どもが18歳。「県外の大学に行きたい」と言う。',
+      stat: '鳥取の高校卒業生のうち、約5割が県外へ進学し、卒業後に鳥取へ戻って就職するのは約3人に1人です。',
+      options: () => [
+        { key: 'support', label: '応援して送り出す', pro: '子どもが望む道を進める', con: '家を出たら、戻ってこないかもしれない' },
+        { key: 'stay', label: '県内の大学を勧める', pro: '近くで成長を見守れる。学費や仕送りの負担が軽い', con: '子どもの夢をせばめてしまうかもしれない' },
+        { key: 'free', label: '本人に任せる', pro: '子ども自身が決めた道になる', con: '親として何も言えなかったと、あとで思うかもしれない' }
+      ],
+      auto: () => pickW([['support', 50], ['stay', 20], ['free', 30]]),
+      resolve(L, key) {
+        L.childPath = key === 'stay' ? (R() < 0.7 ? 'in' : 'out') : key === 'support' ? 'out' : (R() < 0.5 ? 'out' : 'in');
+        L.add('life', L.childPath === 'out' ? '子どもは県外の大学へ進学した。家が急に静かになった。' : '子どもは県内の大学に進んだ。');
+      }
+    },
+    oldhome: {
+      title: '退職した。これからどこで暮らす？',
+      stat: '鳥取県の65歳以上の割合は33.9%（2024年）。',
+      options: L => [
+        { key: 'home', label: '鳥取に帰って暮らす', pro: '生まれた町で、昔の友達と過ごせる', con: L.kids ? '子どもや孫とは離れることになる' : '長く離れていた町に、知り合いが減っている' },
+        { key: 'stay', label: 'いまの場所で暮らし続ける', pro: '慣れた暮らしと人間関係を続けられる', con: '鳥取に帰る機会は少なくなっていく' }
+      ],
+      auto: L => (R() < 0.15 * (0.5 + L.tie / 100) ? 'home' : 'stay'),
+      resolve(L, key) {
+        if (key === 'home') L.moveHome('退職を機に、鳥取（{place}）へ戻った。');
+        else L.add('life', `${L.place}で暮らし続けることにした。`);
+      }
+    },
+    offer: {
+      title: L => `${L.offerPref}の会社から、うちに来ないかと誘われた。`,
+      stat: '鳥取県の平均年収は約452万円（2023年）。都市部の多くはこれを上回りますが、家賃や物価も高くなります。',
+      options: L => [
+        { key: 'go', label: `${L.offerPref}へ移って働く`, pro: `年収の目安は約${L.est(L.offerPref)}万円（鳥取なら約${L.est('鳥取')}万円）。大きな仕事に関われる`, con: '家族や友達と離れる。家賃が上がる' },
+        { key: 'no', label: '断って、鳥取で働き続ける', pro: 'いまの暮らしと人間関係を続けられる', con: '「あのとき行っていたら」と考える日があるかもしれない' }
+      ],
+      auto: () => (R() < 0.18 ? 'go' : 'no'),
+      resolve(L, key) {
+        if (key === 'go') { const d = L.offerPref; L.startJob(L.industry); L.wageMul *= 1.08; L.moveOut(d, `誘いを受けて、${d}の会社に移った。`); }
+        else { L.bump(5); L.add('life', '誘いは断った。鳥取での暮らしを選んだ。'); }
+      }
+    },
+    friends: {
+      title: '帰省してきた同級生が、都会での仕事の話をしていた。',
+      stat: '鳥取県の持ち家率は69.6%で全国（60.9%）より高い一方、平均年収は全国平均を下回ります。',
+      options: L => [
+        { key: 'go', label: '自分も県外に出て、挑戦してみる', pro: '新しい仕事や出会いがある。給料が上がる可能性', con: '一から人間関係をつくり直す。転職がうまくいく保証はない' },
+        { key: 'stay', label: '鳥取での暮らしを続ける', pro: '通勤が短く、休日に海や山へすぐ行ける。家族が近い', con: '同級生の話を聞くたびに、少し心が揺れる' }
+      ],
+      auto: () => (R() < 0.15 ? 'go' : 'stay'),
+      resolve(L, key) {
+        if (key === 'go') {
+          if (R() < 0.7) { const d = destPref(false); L.startJob(); L.moveOut(d, `思い切って${d}で転職した。${L.industry}の仕事。`); }
+          else L.add('fate', '県外の会社を何社か受けたが、決まらなかった。');
+        } else { L.bump(4); L.add('life', '同級生と別れたあと、夕焼けの海を見ながら帰った。ここでいい、と思った。'); }
+      }
+    },
+    transfer: {
+      title: L => `会社から、${L.offerPref}への転勤を打診された。`,
+      stat: '鳥取県の雇用者のうち正社員は約68%（2020年国勢調査）。地元の正社員の仕事は、簡単には見つかりません。',
+      options: L => [
+        { key: 'go', label: '転勤を受ける', pro: '昇進につながりやすい。給料が少し上がる', con: '家族や家をどうするか決めなければならない' },
+        { key: 'no', label: '断って、いまの職場に残る', pro: '鳥取での暮らしを続けられる', con: '社内での評価に響くかもしれない' },
+        { key: 'quit', label: '会社を辞めて、鳥取で別の仕事を探す', pro: '鳥取に残れる', con: '給料が下がることが多い。正社員の仕事が見つかるとは限らない' }
+      ],
+      auto: () => pickW([['go', 35], ['no', 55], ['quit', 10]]),
+      resolve(L, key) {
+        if (key === 'go') { const d = L.offerPref; L.wageMul *= 1.06; L.moveOut(d, `転勤で${d}へ移った。`); }
+        else if (key === 'no') { L.wageMul *= 0.97; L.bump(3); L.add('life', '転勤は断った。上司は少し残念そうだった。'); }
+        else { L.startJob(); L.wageMul *= 0.92; L.bump(5); L.add('life', `会社を辞め、${L.place}で${L.industry}の仕事に就いた。${L.regular ? '' : '正社員の仕事は見つからなかった。'}`); }
+      }
+    },
+    callhome: {
+      title: '鳥取の先輩から、地元の会社で一緒に働かないかと声がかかった。',
+      stat: '県外の学校を出た鳥取出身者のうち、卒業時に鳥取で就職するのは約35%。その後に戻る人もいます。',
+      options: L => [
+        { key: 'go', label: '誘いに乗って、鳥取へ戻る', pro: `仕事が決まった状態で帰れる。家族や友達が近い`, con: `年収の目安は約${L.est(L.place)}万円→約${L.est('鳥取')}万円。いまの職場を離れる` },
+        { key: 'no', label: 'ありがたいが、断る', pro: 'いまのキャリアを続けられる', con: '次に帰るきっかけが来るかはわからない' }
+      ],
+      auto: () => (R() < 0.3 ? 'go' : 'no'),
+      resolve(L, key) {
+        if (key === 'go') { L.moveHome('先輩の誘いで、鳥取（{place}）へ戻った。'); L.add('life', `${L.industry}の仕事に就いた。`); }
+        else { L.bump(-2); L.add('life', '誘いは断った。先輩は「気が変わったらいつでも」と言ってくれた。'); }
+      }
+    },
+    parentcall: {
+      title: '親から電話。「そろそろ帰ってこんの？」',
+      stat: '県外で暮らす鳥取出身の若者の約7割が、いつか鳥取に戻りたいと考えています（県の意識調査）。',
+      options: () => [
+        { key: 'return', label: '帰る準備を始める', pro: '親のそばにいられる', con: '仕事を探し直す必要がある' },
+        { key: 'visit', label: 'まだ帰らないが、帰省を増やす', pro: 'いまの仕事を続けながら、親との時間も増やせる', con: '交通費と移動の時間がかかる' },
+        { key: 'no', label: 'こっちで生きていくと伝える', pro: '自分の暮らしをはっきり決められる', con: '電話の向こうで、親が少し黙った' }
+      ],
+      auto: () => pickW([['return', 15], ['visit', 55], ['no', 30]]),
+      resolve(L, key) {
+        if (key === 'return') {
+          if (R() < 0.6) { L.moveHome('仕事を見つけて、鳥取（{place}）へ戻った。'); L.add('life', `${L.industry}の仕事に就いた。`); }
+          else { L.bump(6); L.add('fate', '鳥取で仕事を探したが、条件の合うものが見つからなかった。'); }
+        } else if (key === 'visit') { L.bump(7); L.add('life', '盆と正月だけでなく、連休にも帰るようにした。'); }
+        else { L.bump(-8); L.add('life', `${L.place}で生きていくと、親に伝えた。`); }
+      }
+    },
+    hs15: {
+      title: '15歳。どの高校に行く？',
+      stat: '鳥取の中学卒業生の97.9%が高校などに進学します。県内には全日制の高校が30校と、5年制の米子高専があります。',
+      options: L => [
+        { key: 'near', label: '家から通える普通科の高校' },
+        { key: 'voc', label: '工業・商業・農業などの専門学科の高校' },
+        { key: 'kosen', label: '米子高専（5年制）を受験する' }
+      ],
+      auto: () => 'auto',
+      resolve(L, key) {
+        const y = L.year;
+        const list = HS[L.region].filter(x => x[0] !== '米子工業高等専門学校' || y >= 1964);
+        if (y < 2008) {
+          const city = { 東部: '鳥取市', 中部: '倉吉市', 西部: '米子市' }[L.region];
+          const k2 = key === 'auto' ? (R() < 0.04 && y >= 1964 && L.region === '西部' ? 'kosen' : R() < 0.35 ? 'voc' : 'near') : key;
+          if (k2 === 'kosen' && (key === 'auto' || R() < 0.7) && y >= 1964) return L.enterHS('米子工業高等専門学校');
+          if (k2 === 'kosen') L.add('fate', y < 1964 ? '米子高専はまだなかった。' : '米子高専は不合格だった。');
+          return L.enterHS(k2 === 'voc' ? `${city}の実業高校` : `${city}の普通科の高校`);
+        }
+        if (key === 'auto') return L.enterHS(pickW(list));
+        if (key === 'kosen') {
+          if (R() < 0.7) return L.enterHS('米子工業高等専門学校');
+          L.add('fate', '米子高専は不合格だった。');
+          key = 'near';
+        }
+        const pool = list.filter(x => x[0] !== '米子工業高等専門学校' && (key === 'voc' ? VOC.test(x[0]) : !VOC.test(x[0])));
+        L.enterHS(pickW(pool));
+      }
+    },
+    seijin: {
+      title: '20歳。成人式の案内が届いた。',
+      stat: '鳥取県から県外への転出が最も多いのは20〜24歳。2020年は、この年代だけで889人の転出超過でした。',
+      options: () => [{ key: 'go', label: '鳥取に帰って成人式に出る' }, { key: 'skip', label: '帰らずに、こっちで過ごす' }],
+      auto: () => (R() < 0.6 ? 'go' : 'skip'),
+      resolve(L, key) {
+        if (key === 'go') { L.bump(12); L.add('life', '成人式に出た。中学の同級生と久しぶりに会い、夜まで話した。'); }
+        else { L.bump(-5); L.add('life', '成人式には帰らなかった。同級生の写真をSNSで見た。'); }
+      }
+    },
+    job27: {
+      title: '27歳。働き始めて数年がたった。',
+      stat: '就職して3年以内に辞める人は、大学卒で33.8%、高校卒で37.9%です（全国、2022年3月卒）。',
+      options: L => L.loc === 'out'
+        ? [{ key: 'stay', label: '今の仕事を続ける' }, { key: 'change', label: '県外で転職する' }, { key: 'home', label: '鳥取の会社に転職する' }].concat(remoteOpt(L))
+        : [{ key: 'stay', label: '今の仕事を続ける' }, { key: 'change', label: '県内で転職する' }, { key: 'out', label: '県外の会社に転職する' }].concat(L.remotePref ? [] : remoteOpt(L)),
+      auto: () => pickW([['stay', 75], ['change', 25]]),
+      resolve(L, key, auto) {
+        if (key === 'remote') { tryRemote(L, auto); return; }
+        if (key === 'stay') { L.wageMul *= 1.03; L.add('life', '今の職場で働き続けることにした。少しずつ任される仕事が増えた。'); return; }
+        if (key === 'home') {
+          if (auto || R() < 0.55) { L.moveHome('鳥取の会社に転職し、{place}に戻った。'); L.add('life', `${L.industry}の仕事に就いた。`); return; }
+          L.add('fate', '鳥取で条件の合う求人が見つからず、転職は見送った。'); return;
+        }
+        if (key === 'out') { const d = destPref(false); L.startJob(); L.moveOut(d, `${d}の会社に転職し、鳥取を出た。${L.industry}の仕事。`); return; }
+        const before = L.industry; L.startJob(); L.wageMul *= 0.9 + R() * 0.3;
+        L.add('life', before === L.industry ? '同じ業界の別の会社に転職した。' : `転職して、${L.industry}の仕事に移った。`);
+      }
+    },
+    marry: {
+      title: '結婚を考える相手がいる。',
+      stat: '鳥取県の婚姻率（人口千人あたり）は3.7で、全国の4.1をやや下回ります（2022年）。',
+      options: () => [{ key: 'yes', label: '結婚する' }, { key: 'no', label: 'いまはまだ結婚しない' }],
+      auto: () => 'yes',
+      resolve(L, key) {
+        if (key === 'yes') L.marry();
+        else L.add('life', '結婚の話は、いったん見送った。');
+      }
+    },
+    kids0: {
+      title: '結婚して1年。子どもについて話し合った。',
+      stat: '鳥取県の合計特殊出生率は1.44（2023年）。全国の1.20を上回り、全国9位です。',
+      options: () => [{ key: 'want', label: '子どもがほしい' }, { key: 'not', label: '子どもはもたない' }],
+      auto: () => 'want',
+      resolve(L, key) {
+        L.planKids = key === 'want' ? Math.max(1, R() < 0.85 ? 1 : 0) : 0;
+        if (key === 'want' && L.planKids === 0) L.add('fate', '子どもを望んだが、なかなか授からなかった。');
+        if (key === 'not') L.add('life', 'ふたりで暮らしていくことに決めた。');
+      }
+    },
+    kidmore: {
+      title: 'もうひとり、子どもを？',
+      stat: '鳥取県の合計特殊出生率は1.44（2023年）。全国の1.20を上回り、全国9位です。',
+      options: () => [{ key: 'more', label: 'もうひとりほしい' }, { key: 'enough', label: 'いまの家族で十分' }],
+      auto: () => 'enough',
+      resolve(L, key) { L.planKids = key === 'more' ? L.kids + 1 : L.kids; }
+    },
+    childwork: {
+      title: '第1子が生まれた。仕事はどうする？',
+      stat: '鳥取県で働く人のうち、正社員は約68%、パート・アルバイトなどは約30%です（2020年国勢調査）。',
+      options: L => [{ key: 'back', label: L.year >= 1992 ? '育休をとって、元の仕事に戻る' : '産休のあと、元の仕事に戻る' }, { key: 'part', label: 'パートに切り替える' }, { key: 'quit', label: '仕事を辞めて子育てに専念する' }],
+      auto: L => (L.sex === 'f' ? pickW([['back', 65], ['part', 25], ['quit', 10]]) : 'back'),
+      resolve(L, key) {
+        if (key === 'back') L.add('life', '育休をとり、1年後に元の職場へ戻った。保育園の送り迎えに追われる毎日。');
+        else if (key === 'part') { L.regular = false; L.add('life', '正社員をやめて、パートで働くことにした。'); }
+        else { L.homeUntil = L.age + 6; L.regular = false; L.add('life', '仕事を辞め、子育てに専念することにした。'); }
+      }
+    },
+    house: {
+      title: '住まいをどうする？',
+      stat: '鳥取県の持ち家率は69.6%で、全国（60.9%）を大きく上回ります（2023年）。',
+      options: L => [{ key: 'buy', label: L.loc === 'tottori' ? `${L.place}に家を建てる・買う` : `${L.place}で家を買う` }, { key: 'rent', label: '賃貸のまま暮らす' }],
+      auto: L => (R() < (L.loc === 'tottori' ? 0.7 : 0.45) ? 'buy' : 'rent'),
+      resolve(L, key) {
+        if (key === 'buy') { L.house = L.loc; L.housePlace = L.place; L.buyHouse(); L.add('life', L.loc === 'tottori' ? `${L.place}に家を建てた。35年のローンを組んだ。` : `${L.place}に家を買った。ここで暮らしていくことになりそうだ。`); if (L.loc === 'tottori') L.bump(8); else L.bump(-8); }
+        else L.add('life', 'しばらくは賃貸で暮らすことにした。');
+      }
+    },
+    community: {
+      title: '40歳。地区の役が回ってきた。',
+      stat: '鳥取県の65歳以上の割合は33.9%（2024年）。地域の行事や見守りを、40〜50代が担う場面が増えています。',
+      options: () => [{ key: 'yes', label: '自治会や消防団の役を引き受ける' }, { key: 'no', label: '仕事を理由に断る' }],
+      auto: () => (R() < 0.55 ? 'yes' : 'no'),
+      resolve(L, key) {
+        if (key === 'yes') { L.bump(15); L.add('life', '地区の役を引き受けた。祭りの準備や草刈りで、近所の顔と名前が一致するようになった。'); }
+        else { L.bump(-4); L.add('life', '地区の役は断った。'); }
+      }
+    },
+    startup: {
+      title: '独立して、自分の店や会社をもつ？',
+      stat: '鳥取県では、商工会議所や県の窓口で創業の相談を受けて開業する人もいます。続けられるかは、準備と運しだいです。',
+      options: L => [{ key: 'start', label: `${L.place}で独立・開業する`, pro: '自分のやりたい商売ができる。うまくいけば収入が増える', con: '売り上げが伸びなければ、店をたたむこともある' }].concat(L.loc === 'out' ? [{ key: 'home', label: '鳥取に戻って開業する', pro: '家賃が安く、地元のつながりを生かせる', con: 'お客さんの数は都市より少ない' }] : []).concat([{ key: 'stay', label: '勤め続ける', pro: '安定した収入が続く', con: 'やりたかったことは、趣味のままになる' }]),
+      auto: () => (R() < 0.08 ? 'start' : 'stay'),
+      resolve(L, key) {
+        if (key === 'stay') { L.add('life', '独立は考えず、勤め続けることにした。'); return; }
+        if (key === 'home' && L.loc === 'out') L.moveHome('鳥取（{place}）に戻って、開業の準備を始めた。');
+        L.selfEmp = true; L.startupAge = L.age; L.regular = true; L.opened = true;
+        L.add('life', `${L.place}で、自分の店（会社）を開いた。${L.industry}の仕事。`);
+      }
+    },
+    retire: {
+      title: '60歳。いつまで働く？',
+      stat: '65〜69歳の54.5%が仕事をしています（全国、2025年）。',
+      options: () => [{ key: '60', label: '60歳で退職する' }, { key: '65', label: '65歳まで働く' }, { key: '70', label: '70歳まで働く' }],
+      auto: () => pickW([['60', 10], ['65', 45], ['70', 45]]),
+      resolve(L, key) {
+        L.retireAge = +key;
+        if (key === '60') { L.retireAge = 61; }
+        if (key !== '60') { L.regular = L.selfEmp ? true : R() < 0.4; L.wageMul *= L.selfEmp ? 1 : 0.75; L.add('life', `${key}歳まで働くことにした。${L.selfEmp ? '' : '嘱託として、給料は少し下がった。'}`); }
+        else L.add('life', '60歳で仕事を退くことにした。');
+      }
+    },
+    akiya: {
+      title: '両親が亡くなり、鳥取の実家が空き家になった。',
+      stat: '鳥取県の空き家率は15.75%で、全国（13.84%）より高くなっています（2023年）。',
+      options: () => [{ key: 'keep', label: '実家を残して、ときどき帰る' }, { key: 'sell', label: '実家を手放す' }],
+      auto: () => (R() < 0.5 ? 'keep' : 'sell'),
+      resolve(L, key) {
+        if (key === 'keep') { L.bump(10); L.add('life', '実家を残すことにした。年に何回か、窓を開けに帰っている。'); }
+        else { L.bump(-12); L.add('life', '実家を手放した。最後に家の中を見て回り、柱の傷を写真に撮った。'); }
+      }
+    },
+    license: {
+      title: '78歳。運転を続ける？',
+      stat: null,
+      options: () => [{ key: 'return', label: '運転免許を返納する' }, { key: 'keep', label: 'もう少し運転を続ける' }],
+      auto: () => (R() < 0.4 ? 'return' : 'keep'),
+      resolve(L, key) {
+        if (key === 'return') L.add('life', '免許を返納した。買い物はバスと、子どもの送り迎えに頼るようになった。');
+        else L.add('life', '運転を続けることにした。夜の運転だけはやめた。');
+      }
+    },
+    shinro: {
+      title: '18歳。高校を卒業したら、どうする？',
+      stat: L => L.year >= 2015 ? '鳥取の高校卒業生のうち、県外の大学・専門学校に進むのは約5割、県内に進学するのは約2割、県内で就職するのも約2割です。' : (w => `${L.year}年ごろの鳥取では、高校卒業生のおよそ${Math.round(w.in_job)}%が県内で就職し、${Math.round(w.out_job)}%が県外で就職、${Math.round(w.out_univ)}%が県外へ進学していました（全国の進学率の推移などをもとにした概算）。`)(shinroW(L.year)),
+      options: L => [
+        { key: 'out_univ', label: '県外の大学・専門学校へ行く', pro: '選べる学校や学部が多い。都会の暮らしを経験できる', con: '学費に加えて家賃や仕送りがかかる。卒業後に鳥取へ戻るのは約3人に1人' },
+        { key: 'in_univ', label: '県内の大学・短大・専門学校へ行く', pro: '実家から通えれば費用をおさえられる。地元の就職先に詳しくなれる', con: '学部や専門分野の選択肢は限られる' },
+        { key: 'in_job', label: '鳥取で就職する', pro: '早くから収入を得られる。家族や友達の近くで暮らせる', con: `大学に進む道はいったん閉じる。年収の目安は30代で約${L.est('鳥取')}万円（高卒・正社員）` },
+        { key: 'out_job', label: '県外で就職する', pro: '都市の大きな会社で働ける。給料の水準が高め', con: '18歳でひとり暮らし。家族や友達と離れる' }
+      ],
+      auto: L => pickW(Object.entries(shinroW(L.year))),
+      resolve(L, key, auto) {
+        let res = key;
+        if (!auto) {
+          if (key === 'out_univ') {
+            const p = clamp(0.55 + 0.35 * L.gaku - (L.kakei === '苦しい' ? 0.1 : 0) + (L.lean === 'out' ? 0.08 : 0), 0.3, 0.95);
+            if (R() > p) res = R() < 0.6 ? 'in_univ' : 'in_job';
+          } else if (key === 'in_univ') {
+            if (R() > 0.8 + 0.15 * L.gaku) res = 'in_job';
+          }
+          if (res !== key) L.add('fate', key === 'out_univ'
+            ? (L.kakei === '苦しい' ? '家の事情もあり、県外への進学はあきらめた。' : '県外の志望校には届かなかった。')
+            : '志望校には届かなかった。');
+        }
+        const longer = R() < 0.6;
+        if (res === 'out_univ') {
+          const d = L.outDest(true);
+          L.schoolName = d + 'の' + (longer ? '大学' : '専門学校');
+          L.school = 'out'; L.schoolEnd = 18 + (longer ? 4 : 2); L.edu = longer ? '大学' : '短大・専門学校';
+          if (d === '東京都' && L.dream === 'tokyo') L.add('life', '東京に出た。夢への一歩。');
+          L.moveOut(d, `${d}の${longer ? '大学' : '専門学校'}に進学し、ひとり暮らしを始めた。`);
+        } else if (res === 'in_univ') {
+          const pool = (longer ? UNIV4 : UNIV2).filter(x => L.year >= ({ 公立鳥取環境大学: 2001, 鳥取看護大学: 2015, 鳥取短期大学: 1971 }[x[0]] || (longer ? 1949 : 2005)));
+          const u = pool.length ? pickW(pool.map(x => [x, x[3]])) : (longer ? ['鳥取大学', '鳥取市', 4, 1] : ['県内の専門学校', '鳥取市', 2, 1]);
+          L.school = 'in'; L.schoolEnd = 18 + u[2]; L.edu = longer ? '大学' : '短大・専門学校';
+          L.schoolName = u[0]; L.schoolInd = u[4];
+          const far = (u[1] === '鳥取市' && L.region !== '東部') || (u[1] === '倉吉市' && L.region !== '中部') || (u[1] === '米子市' && L.region !== '西部');
+          L.add('life', `${u[0]}（${u[1]}）に進学した。` + (far ? '実家を出て下宿を始めた。' : '実家から通う。'));
+        } else if (res === 'in_job') {
+          L.stage = 'work'; L.job = '県内'; L.startJob();
+          L.add('life', `${L.place}で就職した。${L.industry}の仕事。`);
+        } else {
+          const d = L.outDest(false);
+          L.stage = 'work'; L.job = '県外'; L.startJob();
+          L.moveOut(d, `${d}で就職し、鳥取を出た。${L.industry}の仕事。`);
+        }
+      }
+    },
+    uturn: {
+      title: '卒業の年。どこで働く？',
+      stat: L => `県外の学校に進んだ鳥取出身者のうち、卒業後に鳥取で就職するのは約35%（${L.sex === 'm' ? '男性は約30%' : '女性は約40%'}）。戻りたいと考える学生は約7割いますが、その差はなかなか埋まりません。`,
+      options: L => [
+        { key: 'return', label: '鳥取に帰って就職したい', pro: `家族や友達が近い。通勤が短く、家を持ちやすい（持ち家率69.6%）。年収の目安は30代で約${L.est('鳥取')}万円`, con: '希望の職種の求人が少なく、思いどおりの仕事に就けるとは限らない' },
+        { key: 'stay', label: 'このまま県外で就職する', pro: `仕事の選択肢が多い。年収の目安は30代で約${L.est(L.place)}万円（${L.place}）`, con: '家賃や生活費が高め。親が年をとったときに離れている' }
+      ].concat(remoteOpt(L)),
+      auto: L => (L.year >= 2020 && R() < interp(REMOTE, L.year) * 0.3 ? 'remote' : R() < UTURN[L.sex] ? 'return' : 'stay'),
+      resolve(L, key, auto) {
+        L.stage = 'work'; if (L.edu === '大学') L.outGrad = true;
+        if (key === 'remote' && tryRemote(L, auto)) return;
+        if (key === 'return') {
+          const ok = auto || R() < Math.min(0.95, UTURN[L.sex] / UTURN_WISH * (L.internT ? 1.35 : 1) * (0.8 + L.tie / 250));
+          if (ok) { L.job = '県内'; L.moveHome('鳥取に戻り、{place}で働き始めた。'); L.add('life', `${L.industry}の仕事に就いた。`); return; }
+          L.add('fate', '鳥取で希望に合う仕事が見つからなかった。');
+        }
+        L.job = '県外'; L.startJob();
+        L.add('life', `${L.place}で就職した。${L.industry}の仕事。`);
+      }
+    },
+    stayjob: {
+      title: '卒業の年。どこで働く？',
+      stat: '県内の大学を出た学生のうち県内に就職するのは全体で約2割。ただし多くは県外出身の学生で、鳥取出身の学生はもっと多く残ります（このゲームでは約6割と見積もっています）。',
+      options: L => [
+        { key: 'stay', label: '鳥取で就職する', pro: `学校で築いた地元のつながりを生かせる。年収の目安は30代で約${L.est('鳥取')}万円`, con: '大企業や専門的な職種の求人は限られる' },
+        { key: 'leave', label: '県外で就職する', pro: `仕事の選択肢が多く、給料の水準が高め（大阪府なら30代で約${L.est('大阪府')}万円）`, con: '一度出ると、戻るきっかけをつかみにくい' }
+      ].concat(remoteOpt(L)),
+      auto: L => (L.year >= 2020 && R() < interp(REMOTE, L.year) * 0.2 ? 'remote' : R() < 0.6 ? 'stay' : 'leave'),
+      resolve(L, key, auto) {
+        L.stage = 'work';
+        if (key === 'remote' && tryRemote(L, auto)) return;
+        const ind = L.schoolInd && R() < 0.85 ? L.schoolInd : (L.edu === '高専' ? pickW([['製造業', 60], ['情報通信業', 15], ['建設業', 15], ['電気・ガス・水道業', 10]]) : null);
+        if (key === 'stay' && (auto || R() < 0.85)) { L.job = '県内'; L.startJob(ind); L.add('life', `${L.place}で就職した。${L.industry}の仕事。`); return; }
+        if (key === 'stay') L.add('fate', '県内の内定が出ず、県外の会社に決まった。');
+        const d = destPref(false); L.job = '県外'; L.startJob(ind);
+        L.moveOut(d, `${d}で就職し、鳥取を出た。${L.industry}の仕事。`);
+      }
+    },
+    mid: {
+      title: '32歳。県外での暮らしにも慣れた。',
+      stat: '鳥取県には毎年およそ9千〜1万人が県外から転入しています。30代はUターンを考える人が増える年代です。',
+      options: L => [
+        { key: 'return', label: '鳥取へのUターン転職を考える', pro: '子育てを親に手伝ってもらいやすい。広い家に住める', con: `年収は下がりやすい（目安：${L.place}約${L.est(L.place)}万円→鳥取約${L.est('鳥取')}万円）。いまの職場の仲間と離れる` },
+        { key: 'stay', label: 'いまの暮らしを続ける', pro: '積み上げてきたキャリアを続けられる', con: '親が年をとるほど、帰るか迷う場面は増えていく' }
+      ],
+      auto: () => (R() < 0.12 ? 'return' : 'stay'),
+      resolve(L, key, auto) {
+        if (key === 'return') {
+          if (auto || R() < 0.55) { L.moveHome('転職して、鳥取（{place}）へ戻った。'); return; }
+          L.add('fate', '条件の合う求人がなく、Uターンは見送った。');
+        }
+      }
+    },
+    care: {
+      title: '親が高齢になってきた。',
+      stat: '鳥取県の65歳以上の割合は約34%。県外に出た子どもが、親の暮らしをどう支えるかは多くの家族の課題です。',
+      options: () => [{ key: 'return', label: '鳥取に戻って親のそばで暮らす' }, { key: 'stay', label: '県外から通って支える' }],
+      auto: () => (R() < 0.3 ? 'return' : 'stay'),
+      resolve(L, key, auto) {
+        if (key === 'return' && (auto || R() < 0.9)) { L.moveHome('親のそばで暮らすため、鳥取（{place}）へ戻った。'); return; }
+        L.add('life', '休みのたびに鳥取へ帰り、親の様子を見に行った。');
+      }
+    }
+  };
+
+  function pickYear(mode) {
+    if (mode === 'now') return 2026;
+    const g = GENS.find(x => x.id === mode);
+    const lo = g ? g.from : 1925, hi = g ? g.to : (mode === 'past' ? 2025 : 2045);
+    const ys = []; for (let y = lo; y <= hi; y++) ys.push([y, interp(BIRTHS, y)]);
+    return pickW(ys);
+  }
+  { const orig = DECISIONS.shinro.resolve;
+    DECISIONS.shinro.resolve = function (L, key, auto) {
+      orig.call(this, L, key, auto);
+      if (L.school && L.schoolEnd > L.age && !L.schoTaken && R() < 0.5) {
+        L.schoTaken = true; const yrs = L.schoolEnd - L.age;
+        L.scho = Math.round(yrs * 75 * interp(WAGE_ERA, L.year));
+        L.add('money', `奨学金を借りて進学した。卒業後に約${L.scho}万円を返していく。`);
+      }
+    };
+  }
+  function runCohort(n, year) {
+    const out = [];
+    for (let i = 0; i < n; i++) {
+      const L = new Life({ auto: true, year: year || pickYear('any') });
+      let guard = 0;
+      while (L.alive && guard++ < 200) L.step();
+      out.push(L.summary());
+    }
+    return out;
+  }
+
+  function fmtMoney(man) { if (man >= 10000) { const oku = Math.floor(man / 10000), r = Math.round((man % 10000) / 1000) * 1000; return oku + '億' + (r ? (r / 1000) + '千万円' : '円'); } return man.toLocaleString('ja-JP') + '万円'; }
+  function runGen(n, gid) { const out = []; for (let i = 0; i < n; i++) { const L = new Life({ auto: true, year: pickYear(gid) }); let g = 0; while (L.alive && g++ < 200) L.step(); out.push(L.summary()); } return out; }
+  G.TottoriSim = { Life, runCohort, runGen, qx, MUNIS, fmtMoney, LOCAL, DREAMS, GENS, genOf, pickYear, births: y => Math.round(interp(BIRTHS, y)), genBirths: g => { let t = 0; for (let y = g.from; y <= g.to; y++) t += interp(BIRTHS, y); return Math.round(t); } };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+(function(){
+  'use strict';
+  const S = window.TottoriSim;
+  const $ = id => document.getElementById(id);
+  let L = null, timer = null, ms = 750, paused = false, auto = false, shown = 0, era = 'any', lastDrawn = -1;
+  (function buildGens(){
+    const grid = $('genGrid');
+    const items = [{ id: 'any', name: 'どの世代でも', yrs: '1925〜2045年', desc: '生まれる年もランダム' }].concat(S.GENS.filter(g => !g.hidden).map(g => ({ id: g.id, name: g.name, yrs: `${g.from}〜${g.to}年生まれ`, desc: g.desc })));
+    items.forEach(it => {
+      const b = document.createElement('button'); b.type = 'button'; b.dataset.gen = it.id; b.setAttribute('aria-pressed', String(it.id === 'any'));
+      b.innerHTML = '<span class="gn"></span><span class="gy"></span><span class="gd"></span>';
+      b.querySelector('.gn').textContent = it.name; b.querySelector('.gy').textContent = it.yrs; b.querySelector('.gd').textContent = it.desc;
+      b.addEventListener('click', () => { era = it.id; grid.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); });
+      grid.appendChild(b);
+    });
+  })();
+
+  function setSpeed(v){
+    ms = v;
+    document.querySelectorAll('[data-ms]').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.ms === ms)));
+    if (timer) { clearInterval(timer); timer = null; tick(); }
+  }
+  document.querySelectorAll('[data-ms]').forEach(b => b.addEventListener('click', () => setSpeed(+b.dataset.ms)));
+
+  // grid
+  const grid = $('grid'); const cells = [];
+  for (let r = 0; r < 11; r++) {
+    const lab = document.createElement('div'); lab.className = 'rl'; lab.textContent = r * 10; grid.appendChild(lab);
+    for (let c = 0; c < 10; c++) { const d = document.createElement('div'); d.className = 'cell'; grid.appendChild(d); cells.push(d); }
+  }
+
+  function start(){
+    L = new S.Life({ auto, year: S.pickYear(era) }); lastDrawn = -1;
+    recordBirth();
+    shown = 0; $('log').innerHTML = ''; $('end').hidden = true; $('end').innerHTML = '';
+    $('start').hidden = true; $('play').hidden = false;
+    paused = false; $('pause').textContent = '一時停止';
+    render(); tick();
+    window.scrollTo({ top: 0 });
+  }
+  $('born').addEventListener('click', start);
+
+  function tick(){
+    if (timer) clearInterval(timer);
+    timer = setInterval(() => {
+      if (paused || !L) return;
+      if (L.pending) { if (auto) L.choose(L.pending.auto || autoKey()); else { render(); return; } }
+      L.step();
+      render();
+      if (!L.alive) { clearInterval(timer); timer = null; finish(); }
+    }, ms);
+  }
+  function autoKey(){ // おまかせ：統計どおりに選ぶ
+    const id = L.pending.id; const was = L.auto; L.auto = true;
+    const p = L.pending; L.pending = null; L.ask(id); L.auto = was;
+    return null;
+  }
+
+  $('pause').addEventListener('click', () => { paused = !paused; $('pause').textContent = paused ? '再開' : '一時停止'; });
+  $('auto').addEventListener('click', () => {
+    auto = !auto; $('auto').setAttribute('aria-pressed', String(auto));
+    if (L) L.auto = auto;
+  });
+
+  function render(){
+    $('name').innerHTML = ''; $('name').append(L.name + '　' + L.birthYear + '年 ' + L.town + '生まれ'); const gt = document.createElement('span'); gt.className = 'gtag'; gt.textContent = S.genOf(L.birthYear).name; if (!S.genOf(L.birthYear).hidden) $('name').appendChild(gt);
+    $('yearN').textContent = L.year;
+    if (L.dream) {
+      const D = S.DREAMS[L.dream]; $('dreamC').hidden = false;
+      $('dreamN').textContent = D.name;
+      $('dreamS').textContent = L.dreamDone ? '叶った' : (L.alive ? 'まだ' : '叶わなかった');
+      $('dreamC').classList.toggle('done', L.dreamDone);
+    } else $('dreamC').hidden = true;
+    $('ageN').textContent = L.age;
+    const inT = L.loc === 'tottori';
+    $('chip').textContent = inT ? '鳥取' : '県外'; $('chip').className = 'chip ' + (inT ? 'tottori' : 'out');
+    $('place').textContent = inT ? L.place : L.place;
+    let tin = 0, tout = 0;
+    cells.forEach((c, i) => {
+      let cls = 'cell';
+      const y = i < L.age ? L.years[i] : (i === L.age ? L.loc : null);
+      if (y) { cls += ' ' + y; if (y === 'tottori') tin++; else tout++; }
+      if (L.marks[i]) cls += ' mk';
+      if (i === L.age && L.alive) cls += ' now';
+      c.className = cls;
+    });
+    $('tIn').textContent = tin; $('tOut').textContent = tout;
+    $('job').textContent = L.jobLabel;
+    $('tieF').style.width = L.tie + '%';
+    $('hapF').style.width = Math.max(0, Math.min(100, L.happy)) + '%';
+    $('mCash').textContent = fmtM(Math.max(0, L.cash)); $('mInv').textContent = fmtM(L.inv);
+    $('mDebt').textContent = fmtM(L.loan + L.scho + Math.max(0, -L.cash)); $('mNet').textContent = fmtM(L.net);
+    $('mPen').textContent = L.pensionAmt ? `年${L.pensionAmt}万円` : '—';
+    if (L.age !== lastDrawn) { lastDrawn = L.age; drawCharts(L, $('chartA'), 320); }
+    $('inc').textContent = L.stage === 'work' && L.income ? `年収 ${L.income}万円` : (L.lifetime ? `これまでの収入 ${S.fmtMoney(L.lifetime)}` : '');
+    // log
+    const ol = $('log');
+    for (; shown < L.log.length; shown++) {
+      const e = L.log[shown]; const li = document.createElement('li');
+      let k = e.kind;
+      if (k === 'move') k += /戻|帰って|鳥取（/.test(e.text) ? ' tohome' : ' toout';
+      li.className = k + ' new';
+      li.innerHTML = '<span class="a"></span><span class="t"></span>';
+      li.firstChild.textContent = e.age + '歳'; const sm = document.createElement('small'); sm.textContent = e.year; li.firstChild.appendChild(sm); li.lastChild.textContent = e.text;
+      ol.prepend(li);
+    }
+    // decision
+    const d = $('decide');
+    if (L.pending && !auto) {
+      if (d.dataset.id !== L.pending.id + L.age) {
+        d.dataset.id = L.pending.id + L.age;
+        $('dTitle').textContent = L.pending.title; $('dStat').textContent = L.pending.stat || ''; $('dStat').hidden = !L.pending.stat;
+        const box = $('dOpts'); box.innerHTML = '';
+        L.pending.options.forEach(o => {
+          const b = document.createElement('button'); b.type = 'button';
+          const lb = document.createElement('span'); lb.className = 'ol'; lb.textContent = o.label; b.appendChild(lb);
+          if (o.pro) { const p = document.createElement('span'); p.className = 'pro'; p.textContent = o.pro; b.appendChild(p); }
+          if (o.con) { const c = document.createElement('span'); c.className = 'con'; c.textContent = o.con; b.appendChild(c); }
+          b.addEventListener('click', () => { L.choose(o.key); d.hidden = true; d.dataset.id = ''; render(); });
+          box.appendChild(b);
+        });
+        d.hidden = false;
+      }
+    } else { d.hidden = true; d.dataset.id = ''; }
+  }
+
+  const fmtM = v => { const a = Math.abs(Math.round(v)); const sgn = v < 0 ? '−' : ''; if (a >= 10000) { const o = Math.floor(a / 10000), r = a % 10000; return sgn + o + '億' + (r ? r.toLocaleString('ja-JP') + '万円' : '円'); } return sgn + a.toLocaleString('ja-JP') + '万円'; };
+  const nice = v => { if (v <= 0) return 100; const p = Math.pow(10, Math.floor(Math.log10(v))); for (const m of [1, 2, 2.5, 5, 10]) if (m * p >= v) return m * p; return 10 * p; };
+  const NS = 'http://www.w3.org/2000/svg';
+  const el = (n, at) => { const e = document.createElementNS(NS, n); for (const k in at) e.setAttribute(k, at[k]); return e; };
+  function drawCharts(src, wrap, W) {
+    const fin = src.fin, age = src.age, n = Math.max(80, age + 2);
+    const H1 = W > 400 ? 120 : 80, H2 = W > 400 ? 150 : 100, P = { l: 40, r: 6, t: 8, b: 16 };
+    const iw = W - P.l - P.r, step = iw / n, bw = Math.max(0.8, step - (step > 3 ? 1 : 0.3));
+    const x0 = i => P.l + i * step;
+    wrap.innerHTML = '';
+    const mk = (title, legend) => { const d = document.createElement('div'); const t = document.createElement('div'); t.className = 'cht'; const s1 = document.createElement('span'); s1.textContent = title; t.appendChild(s1); if (legend) { const lg = document.createElement('span'); lg.className = 'lg'; legend.forEach(([c, l]) => { const sp = document.createElement('span'); const ii = document.createElement('i'); ii.style.background = c; sp.appendChild(ii); sp.append(l); lg.appendChild(sp); }); t.appendChild(lg); } d.appendChild(t); wrap.appendChild(d); return d; };
+    // 年収
+    let maxI = 0; fin.forEach(f => { if (f && f.inc > maxI) maxI = f.inc; }); maxI = nice(Math.max(maxI, 100));
+    const ih1 = H1 - P.t - P.b, yI = v => P.t + ih1 - v / maxI * ih1;
+    const s1 = el('svg', { viewBox: `0 0 ${W} ${H1}`, role: 'img', 'aria-label': '年齢ごとの年収' });
+    s1.appendChild(el('line', { x1: P.l, x2: W - P.r, y1: yI(0), y2: yI(0), class: 'ax' }));
+    s1.appendChild(el('line', { x1: P.l, x2: W - P.r, y1: yI(maxI), y2: yI(maxI), class: 'ax', 'stroke-dasharray': '2 3' }));
+    const tl = (sv, x, y, t, anchor) => { const e = el('text', { x, y, 'text-anchor': anchor || 'end', 'dominant-baseline': 'middle' }); e.textContent = t; sv.appendChild(e); };
+    tl(s1, P.l - 4, yI(maxI), maxI.toLocaleString('ja-JP')); tl(s1, P.l - 4, yI(0), '0');
+    fin.forEach((f, i) => { if (f && f.inc > 0) { const y = yI(f.inc); s1.appendChild(el('rect', { x: x0(i), y, width: bw, height: Math.max(0.5, yI(0) - y), rx: step > 4 ? 1.5 : 0, fill: 'var(--c-inc)' })); } });
+    for (let a = 0; a <= n; a += 20) tl(s1, x0(a), H1 - 5, a + '歳', 'start');
+    mk('年収（万円）').appendChild(s1);
+    // 資産
+    let top = 0, bot = 0; fin.forEach(f => { if (f) { top = Math.max(top, f.cash + f.inv); bot = Math.max(bot, f.debt); } });
+    top = top > 0 ? nice(top) : 0; bot = bot > 0 ? nice(bot) : 0; if (!top && !bot) top = 100;
+    const ih2 = H2 - P.t - P.b, span = top + bot, yA = v => P.t + (top - v) / span * ih2;
+    const s2 = el('svg', { viewBox: `0 0 ${W} ${H2}`, role: 'img', 'aria-label': '年齢ごとの貯金・投資・借金' });
+    if (top) { s2.appendChild(el('line', { x1: P.l, x2: W - P.r, y1: yA(top), y2: yA(top), class: 'ax', 'stroke-dasharray': '2 3' })); tl(s2, P.l - 4, yA(top), top.toLocaleString('ja-JP')); }
+    if (bot) { s2.appendChild(el('line', { x1: P.l, x2: W - P.r, y1: yA(-bot), y2: yA(-bot), class: 'ax', 'stroke-dasharray': '2 3' })); tl(s2, P.l - 4, yA(-bot), '−' + bot.toLocaleString('ja-JP')); }
+    fin.forEach((f, i) => { if (!f) return; const x = x0(i);
+      if (f.cash > 0) s2.appendChild(el('rect', { x, y: yA(f.cash), width: bw, height: yA(0) - yA(f.cash), fill: 'var(--c-cash)' }));
+      if (f.inv > 0) s2.appendChild(el('rect', { x, y: yA(f.cash + f.inv), width: bw, height: Math.max(0, yA(f.cash) - yA(f.cash + f.inv) - (f.cash > 0 && step > 3 ? 0.6 : 0)), fill: 'var(--c-inv)' }));
+      if (f.debt > 0) s2.appendChild(el('rect', { x, y: yA(0), width: bw, height: yA(-f.debt) - yA(0), fill: 'var(--c-debt)' }));
+    });
+    s2.appendChild(el('line', { x1: P.l, x2: W - P.r, y1: yA(0), y2: yA(0), class: 'zero' })); tl(s2, P.l - 4, yA(0), '0');
+    for (let a = 0; a <= n; a += 20) tl(s2, x0(a), H2 - 5, a + '歳', 'start');
+    mk('資産（万円）', [['var(--c-cash)', '貯金'], ['var(--c-inv)', '投資'], ['var(--c-debt)', 'ローン・借金']]).appendChild(s2);
+    // hover
+    const tip = document.createElement('div'); tip.className = 'tip'; tip.hidden = true; wrap.appendChild(tip);
+    const xh = [el('line', { class: 'xh', y1: P.t, y2: H1 - P.b }), el('line', { class: 'xh', y1: P.t, y2: H2 - P.b })]; xh.forEach(l => l.style.display = 'none'); s1.appendChild(xh[0]); s2.appendChild(xh[1]);
+    const move = (ev, sv) => {
+      const r = sv.getBoundingClientRect(); const sx = (ev.clientX - r.left) / r.width * W; const i = Math.floor((sx - P.l) / step);
+      const f = fin[i]; if (!f || i < 0) { hide(); return; }
+      const cx = x0(i) + bw / 2; xh.forEach(l => { l.setAttribute('x1', cx); l.setAttribute('x2', cx); l.style.display = ''; });
+      tip.innerHTML = '';
+      const head = document.createElement('div'); head.style.fontWeight = '700'; head.textContent = `${i}歳（${f.y}年）`; tip.appendChild(head);
+      [['', '年収', f.inc], ['var(--c-cash)', '貯金', f.cash], ['var(--c-inv)', '投資', f.inv], ['var(--c-debt)', 'ローン・借金', f.debt], ['', '純資産', f.cash + f.inv - f.debt]].forEach(([c, l, v]) => {
+        const row = document.createElement('div'); row.className = 'tr'; const a1 = document.createElement('span'); if (c) { const ii = document.createElement('i'); ii.style.background = c; a1.appendChild(ii); } a1.append(l); const b1 = document.createElement('b'); b1.textContent = fmtM(v); row.append(a1, b1); tip.appendChild(row); });
+      tip.hidden = false; const wr = wrap.getBoundingClientRect(); let left = ev.clientX - wr.left + 12; if (left + 170 > wr.width) left = ev.clientX - wr.left - 180; tip.style.left = Math.max(0, left) + 'px'; tip.style.top = Math.max(0, ev.clientY - wr.top - 40) + 'px';
+    };
+    const hide = () => { tip.hidden = true; xh.forEach(l => l.style.display = 'none'); };
+    [s1, s2].forEach(sv => { sv.addEventListener('pointermove', ev => move(ev, sv)); sv.addEventListener('pointerleave', hide); sv.addEventListener('pointerdown', ev => move(ev, sv)); });
+  }
+
+  // ---- みんなの記録（Googleスプレッドシートに保存） ----
+  // ↓ Apps Script の「ウェブアプリのURL」を '' の中に貼り付けてください。空のままなら記録は送られません。
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbzQxV3pttIExpsrjqzKJeg-mOs4QOSTwSBD5ZBqPLAM0A1TL666Ze9FZGZmsv0eOUBW/exec';
+  let lifeId = null, sendQ = Promise.resolve(), canWrite = !!ENDPOINT, lifeRef = null;
+  const send = d => { if (!ENDPOINT) return Promise.resolve(false); sendQ = sendQ.then(() => fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(d) }).then(r => r.ok).catch(() => false)); return sendQ; };
+  function loadCrowd() {
+    if (!ENDPOINT) return;
+    fetch(ENDPOINT).then(r => r.json()).then(renderCrowd).catch(() => {});
+  }
+  if (ENDPOINT) { $('crowd').hidden = false; loadCrowd(); setInterval(() => { if (!$('start').hidden) loadCrowd(); }, 60000); }
+  function renderCrowd(res) {
+    const nd = res.done || 0, n = res.born || 0;
+    const pc = v => v === null || v === undefined ? '—' : Math.round(v * 100) + '%';
+    const box = $('cstats'); box.innerHTML = '';
+    [[n.toLocaleString('ja-JP') + '人', 'これまでに生まれた人'], [nd.toLocaleString('ja-JP') + '人', '人生を最後まで生きた人'], [res.avgAge ? res.avgAge.toFixed(1) + '歳' : '—', 'みんなの平均寿命'], [pc(res.diedInT), '最期を鳥取で迎えた'], [pc(res.dream), '夢が叶った']].forEach(([v, l]) => {
+      const d = document.createElement('div'); const b = document.createElement('b'); b.textContent = v; d.appendChild(b); d.append(l); box.appendChild(d); });
+    const ol = $('crecent'); ol.innerHTML = '';
+    (res.recent || []).forEach(r => {
+      const li = document.createElement('li');
+      const t = document.createElement('span');
+      t.textContent = `${r.by}年・${String(r.town || '').slice(0, 20)}生まれ、${r.age}歳。${String(r.line || '').slice(0, 40)}。`;
+      const m = document.createElement('span'); m.className = 'cm';
+      m.textContent = `鳥取で${r.inT}年・県外で${r.out}年${r.dream ? `　夢「${String(r.dream).slice(0, 24)}」${r.dreamDone ? '叶った' : '叶わなかった'}` : ''}${r.cause ? `　${String(r.cause).slice(0, 16)}` : ''}`;
+      li.append(t, m);
+      if (r.note) { const q = document.createElement('span'); q.className = 'cq'; q.textContent = String(r.note).slice(0, 60); li.appendChild(q); }
+      ol.appendChild(li);
+    });
+    $('cempty').hidden = nd > 0;
+  }
+  function recordBirth() {
+    lifeId = null; lifeRef = null;
+    if (!ENDPOINT) return;
+    lifeId = Array.from(crypto.getRandomValues(new Uint8Array(12)), x => (x % 36).toString(36)).join('');
+    lifeRef = lifeId;
+    send({ id: lifeId, status: 'alive', startedAt: Date.now(), by: L.birthYear, gen: S.genOf(L.birthYear).id, muni: L.muni, town: L.town, sex: L.sex });
+  }
+  function recordDeath(s, placeLine) {
+    if (!lifeId) return;
+    send({ id: lifeId, status: 'done', endedAt: Date.now(), age: s.age, cause: s.cause || '', inT: s.inT, out: s.out, everLeft: !!s.everLeft, returned: s.returned || 0, diedIn: s.diedIn, deathPlace: s.deathPlace || '', line: placeLine, dream: s.dream ? S.DREAMS[s.dream].name : '', dreamDone: !!s.dreamDone, edu: s.edu || '', school: s.school || '', hs: s.hs || '', industry: s.industry || '', lifetime: s.lifetime || 0, net: s.net || 0, married: !!s.married, kids: s.kids || 0, choices: (s.choices || []).slice(0, 40).map(c => `${c.age}歳：${c.label}`) });
+  }
+  const queueWrite = fn => fn();
+
+  function pct(a, f){ return a.length ? Math.round(100 * a.filter(f).length / a.length) : 0; }
+
+  function finish(){
+    const s = L.summary();
+    const end = $('end'); end.hidden = false;
+    const eduTxt = s.edu === '中学校' ? '中学校' : s.edu === '高校' ? '高校' : s.edu;
+    const placeLine = s.everLeft ? (s.diedIn === 'tottori' ? '一度は鳥取を出て、また戻ってきた人生' : '鳥取を出て、外で生きた人生') : '一度も鳥取を出なかった人生';
+    end.innerHTML = `
+      <h2></h2>
+      <dl class="facts2">
+        <div><dt>生まれ</dt><dd></dd></div>
+        <div><dt>夢</dt><dd></dd></div>
+        <div><dt>生まれた病院</dt><dd></dd></div>
+        <div><dt>生きた年数</dt><dd class="num"></dd></div>
+        <div><dt>鳥取 / 県外</dt><dd class="num"></dd></div>
+        <div><dt>最後の学校</dt><dd></dd></div>
+        <div><dt>家族</dt><dd></dd></div>
+        <div><dt>最期の場所</dt><dd></dd></div>
+        <div><dt>中学校</dt><dd></dd></div>
+        <div><dt>高校</dt><dd></dd></div>
+        <div><dt>仕事</dt><dd></dd></div>
+        <div><dt>生涯の収入</dt><dd class="num"></dd></div>
+        <div><dt>いちばん高い年収</dt><dd class="num"></dd></div>
+        <div><dt>最期に残したお金</dt><dd class="num"></dd></div>
+      </dl>
+      <div class="endcharts"><div class="charts" id="chartE"></div></div>
+      <div class="forks" id="forks"></div>
+      <div class="cohort"><h3 id="cohH"></h3><p>このゲームの統計で、同じ年に生まれた人たちの人生を一気に流した結果です。</p><div id="bars">計算しています…</div></div>
+      <div class="leave" id="leaveBox" hidden><label for="leaveIn" class="lbl" style="flex-basis:100%;margin:0">この人生にひとこと残す（みんなの人生に名前なしで表示されます）</label><input id="leaveIn" maxlength="60" placeholder="例：鳥取に帰ってきてよかった"><button type="button" class="ghost" id="leaveBtn">残す</button><span class="toast" id="leaveMsg"></span></div>
+      <div class="actions"><button type="button" class="primary" id="again">もう一度生まれる</button><button type="button" class="ghost" id="copy">結果をコピー</button><span class="toast" id="toast"></span></div>`;
+    const dd0 = end.querySelectorAll('dd');
+    const dd = [dd0[0]].concat(Array.from(dd0).slice(3));
+    dd0[2].textContent = s.hospital;
+    dd0[1].textContent = s.dream ? `「${S.DREAMS[s.dream].name}」${s.dreamDone ? '叶った' : '叶わなかった'}` : '—';
+    end.querySelector('h2').textContent = `${s.birthYear}年生まれ（${S.genOf(s.birthYear).name}）、${s.name}、${s.age}歳。${placeLine}。`;
+    recordDeath(s, placeLine);
+    if (lifeRef && canWrite) {
+      $('leaveBox').hidden = false;
+      const id = lifeId;
+      $('leaveBtn').addEventListener('click', () => {
+        const v = $('leaveIn').value.trim().slice(0, 60); if (!v) return;
+        $('leaveBtn').disabled = true;
+        send({ id, note: v }).then(ok => { $('leaveMsg').textContent = ok ? '残しました' : '保存できませんでした'; });
+      });
+    }
+    dd[0].textContent = s.birthYear + '年・' + s.town;
+    dd[1].textContent = s.age + '年';
+    dd[2].textContent = s.inT + '年 / ' + s.out + '年';
+    dd[3].textContent = s.age < 18 ? '—' : eduTxt;
+    dd[4].textContent = s.age < 18 ? '—' : (s.married ? '結婚' : '結婚せず') + (s.kids ? `・子ども${s.kids}人` : '');
+    dd[5].textContent = s.diedIn === 'tottori' ? '鳥取県' + s.deathPlace : s.deathPlace;
+    dd[6].textContent = s.jhs || '—';
+    dd[7].textContent = s.hs || '—';
+    dd[8].textContent = s.industry || '—';
+    dd[9].textContent = s.lifetime ? S.fmtMoney(s.lifetime) : '—';
+    dd[10].textContent = s.peak ? `${s.peak}万円` : '—';
+    dd[11].textContent = s.age >= 18 ? fmtM(s.net) : '—';
+    drawCharts({ fin: s.fin, age: s.age }, $('chartE'), 640);
+    if (s.school) dd[3].textContent = s.school;
+    const fk = $('forks');
+    if (s.choices.length) {
+      fk.innerHTML = '<h3>あなたが選んだ分岐点</h3><ol></ol>';
+      const ol2 = fk.querySelector('ol');
+      s.choices.forEach(c => {
+        const li = document.createElement('li');
+        li.innerHTML = '<span class="fa"></span><span><span class="fq"></span><span class="fl"></span></span>';
+        li.querySelector('.fa').textContent = c.age + '歳';
+        li.querySelector('.fq').textContent = c.title;
+        li.querySelector('.fl').textContent = '→ ' + c.label;
+        ol2.appendChild(li);
+      });
+    }
+    const f = s.friend;
+    if (s.age >= 18) {
+      const fp = document.createElement('p');
+      const fs = { out_univ: '県外の大学へ進み', in_univ: '県内の大学に進み', in_job: '地元で就職し', out_job: '県外で就職し' }[f.path];
+      const fb = f.back === 'back' ? '、のちに鳥取へ戻った' : f.back === 'stay' ? '、鳥取で暮らし続けた' : f.back === 'out' ? '、県外で暮らし続けた' : '';
+      fp.textContent = `幼なじみの${f.name}は、${fs}${fb}。`;
+      fk.appendChild(fp);
+    }
+    $('again').addEventListener('click', () => { $('start').hidden = false; $('play').hidden = true; window.scrollTo({ top: 0 }); });
+    $('copy').addEventListener('click', () => {
+      const t = `#53万分の1 ${S.genOf(s.birthYear).name}。${s.birthYear}年、${s.town}に生まれ、${s.age}歳まで生きた。鳥取で${s.inT}年、県外で${s.out}年。${s.lifetime ? '生涯の収入は' + S.fmtMoney(s.lifetime) + '。' : ''}${placeLine}。`;
+      const done = () => { $('toast').textContent = 'コピーしました'; };
+      try { navigator.clipboard.writeText(t).then(done, () => { $('toast').textContent = t; }); } catch (e) { $('toast').textContent = t; }
+    });
+    end.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => {
+      const G0 = S.genOf(s.birthYear), nb = S.genBirths(G0);
+      $('cohH').textContent = `${G0.name}（${G0.from}〜${G0.to}年生まれ）の鳥取生まれ 約${nb.toLocaleString('ja-JP')}人は`;
+      const c = S.runGen(3000, G0.id);
+      const adult = c.filter(x => x.age >= 30);
+      const rows = [
+        ['一度でも県外で暮らした', pct(c, x => x.everLeft), s.everLeft],
+        ['30歳で鳥取に住んでいた', pct(adult, x => x.locAt30 === 'tottori'), s.locAt30 === 'tottori'],
+        ['最期を鳥取で迎えた', pct(c, x => x.diedIn === 'tottori'), s.diedIn === 'tottori'],
+        ['80歳を迎えた', pct(c, x => x.age >= 80), s.age >= 80],
+        ['夢が叶った', pct(c, x => x.dreamDone), s.dreamDone]
+      ];
+      const avg = (c.reduce((a, x) => a + x.age, 0) / c.length).toFixed(1);
+      $('bars').innerHTML = rows.map(r => `<div class="bar"><span>${r[0]}<br><span class="you">あなた：${r[2] ? 'はい' : 'いいえ'}</span></span><span class="track"><span class="fill" style="width:${r[1]}%"></span></span><span class="v">${r[1]}%</span></div>`).join('')
+        + `<p>平均で${avg}年生きました。あなたは${s.age}年。</p>` + (() => { const w = c.filter(x => x.age >= 66); const a = Math.round(w.reduce((t, x) => t + x.lifetime, 0) / w.length); return `<p>66歳以上まで生きた人の生涯の収入は平均${S.fmtMoney(a)}。あなたは${s.lifetime ? S.fmtMoney(s.lifetime) : '0円'}。</p>`; })();
+    }, 60);
+  }
+})();
+</script>
+
+</body>
+</html>
